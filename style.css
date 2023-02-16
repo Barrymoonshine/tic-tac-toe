@@ -1,19 +1,18 @@
-*{
-    margin:0px;
+* {
+  margin: 0px;
 }
 
-
-#container{
-    height:100vh;
-    display: grid;
-    grid-template-columns: repeat(3,60px);
-    grid-template-rows: repeat(3,60px);
-    justify-content: center;
-    align-content: center;
+#container {
+  height: 100vh;
+  display: grid;
+  grid-template-columns: repeat(3, 100px);
+  grid-template-rows: repeat(3, 100px);
+  justify-content: center;
+  align-content: center;
 }
 
 .boardSquares {
-    width:60px;
-    height:60px;
-    border: 1px solid black;
+  width: 100px;
+  height: 100px;
+  border: 1px solid black;
 }
