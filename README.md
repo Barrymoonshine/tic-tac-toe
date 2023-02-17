@@ -1,7 +1,13 @@
-# tic-tac-toe
-Tic Tac Toe project from the Odin Project 
+# Tic Tac Toe project
 
-Learning:
+Link live demo
 
-- Factory functions - create players
-- module pattern - createGameBoard
+## Summary
+
+Insert summary
+
+## Key learning points
+
+- Factory Functions
+- The Module Pattern and IIFEs (Immediately Invoked Function Expression).
+- Closure, private variables and scope

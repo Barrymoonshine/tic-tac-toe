@@ -1,3 +1,6 @@
+const gameBoardContainer = document.getElementById("game-board-container");
+let count = 0;
+
 const createGameBoard = (function () {
   const gameBoard = ["", "", "", "", "", "", "", "", ""];
   return {
@@ -5,7 +8,7 @@ const createGameBoard = (function () {
   };
 })();
 
-const playerFactory = (name, selector) => ({ name, selector });
+const playerFactory = (name, marker) => ({ name, marker });
 
 const playerOne = playerFactory("playerOne", "X");
 
@@ -14,39 +17,31 @@ const playerTwo = playerFactory("playerTwo", "O");
 function renderGameBoard() {
   for (i = 0; i < 9; i++) {
     const boardSquare = document.createElement("div");
-    boardSquare.className = "boardSquares";
+    boardSquare.className = "board-squares";
     boardSquare.id = i;
     boardSquare.textContent = createGameBoard.gameBoard[i];
-    document.getElementById("container").appendChild(boardSquare);
+    gameBoardContainer.appendChild(boardSquare);
   }
 }
 
 renderGameBoard();
 
-const boardSquares = document.getElementsByClassName("boardSquares");
-
-function applyEventListeners() {
-  for (i of boardSquares) {
-    i.addEventListener("click", getPlayer(e));
-  }
-}
-
 // Factory function to generate a private variable count to keep this safe from cheating,
 // which increments by 1 each time function is called
-const counterCreator = () => {
-  let count = 0;
-  return () => {
-    count++;
-  };
-};
+function incrementByOne() {
+  count++;
+}
 
-const counter = counterCreator();
-
-const getPlayer = function (e) {
+gameBoardContainer.addEventListener("click", (e) => {
   // Checks which player's turn it should be using a counter,
   // even is playerOne, odd playerTwo,
   // note use array methods and the target id to update the appropriate array index
-  counter();
-  if (counter % 2 == 0) {
+  incrementByOne();
+  console.log(count);
+  const targetSquare = document.getElementById(e.target.id);
+  if (count % 2 === 0) {
+    targetSquare.textContent = playerOne.marker;
+  } else {
+    targetSquare.textContent = playerTwo.marker;
   }
-};
+});
