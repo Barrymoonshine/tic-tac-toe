@@ -1,6 +1,16 @@
 const gameBoardContainer = document.getElementById("game-board-container");
 let count = 0;
 
+function getAllIndexes() {
+  const currentArray = gameBoard.gameBoardArray;
+  currentArray.reduce((array, element, index) => {
+    if (element === "X") {
+      array.push(index);
+    }
+    return array;
+  }, []);
+}
+
 // Module pattern to generate game board array
 const gameBoard = (function () {
   const gameBoardArray = ["", "", "", "", "", "", "", "", ""];
@@ -13,6 +23,26 @@ const gameBoard = (function () {
 const playerFactory = (name, marker) => ({ name, marker });
 const playerOne = playerFactory("playerOne", "X");
 const playerTwo = playerFactory("playerTwo", "O");
+
+gameBoardContainer.addEventListener("click", handleGameFlow);
+
+function handleGameFlow(e) {
+  // Checks which player's using a counter, odd is playerOne, odd playerTwo
+  // Checks if a square has already been used
+  incrementByOne();
+  const targetSquare = document.getElementById(e.target.id);
+  console.log(targetSquare);
+  const index = targetSquare.id;
+  if (targetSquare.textContent == "X" || targetSquare.textContent == "O") {
+  } else if (count % 2 !== 0) {
+    targetSquare.textContent = playerOne.marker;
+    gameBoard.gameBoardArray[index] = playerOne.marker;
+  } else {
+    targetSquare.textContent = playerTwo.marker;
+    gameBoard.gameBoardArray[index] = playerTwo.marker;
+  }
+  checkForWinner();
+}
 
 function renderGameBoard() {
   for (i = 0; i < 9; i++) {
@@ -29,22 +59,8 @@ const incrementByOne = () => {
   count++;
 };
 
-gameBoardContainer.addEventListener("click", (e) => {
-  // Checks which player's turn it should be using a counter,
-  // even is playerOne, odd playerTwo,
-  // note use array methods and the target id to update the appropriate array index
-  incrementByOne();
-  const targetSquare = document.getElementById(e.target.id);
-  const index = targetSquare.id;
-  if (count % 2 !== 0) {
-    targetSquare.textContent = playerOne.marker;
-    gameBoard.gameBoardArray[index] = playerOne.marker;
-    console.log("playerOne");
-    console.log(count);
-  } else {
-    targetSquare.textContent = playerTwo.marker;
-    gameBoard.gameBoardArray[index] = playerTwo.marker;
-    console.log("playerTwo");
-    console.log(count);
-  }
-});
+function checkForWinner() {
+  // Checks if the current gameBoardArray matches a winning pattern and returns,
+  // a congratulations message
+  getAllIndexes();
+}
