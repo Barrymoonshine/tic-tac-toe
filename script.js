@@ -1,13 +1,15 @@
 const gameBoardContainer = document.getElementById("game-board-container");
 let count = 0;
-const horizontalWinOne = [0, 1, 2];
-const horizontalWinTwo = [3, 4, 5];
-const horizontalWinThree = [6, 7, 8];
-const verticalWinOne = [0, 3, 6];
-const verticalWinTwo = [1, 4, 7];
-const verticalWinThree = [2, 5, 8];
-const diagonalWinOne = [0, 4, 8];
-const diagonalWinTwo = [2, 4, 6];
+const winningPatterns = [
+  [0, 1, 2],
+  [3, 4, 5],
+  [6, 7, 8],
+  [0, 3, 6],
+  [1, 4, 7],
+  [2, 5, 8],
+  [0, 4, 8],
+  [2, 4, 6],
+];
 
 // Module pattern to generate game board array
 const gameBoard = (function () {
@@ -68,13 +70,16 @@ function checkForWinner() {
     return array;
   }, []);
 
+  winningPatterns.forEach((array) => {
+    if (multipleInArray(playerOneIndexes, array) === true) {
+      alert("Player one has won!");
+    }
+  });
+}
+
+function multipleInArray(playerOneIndexes, array) {
   // Loops through the winning index values to check,
   // if they are contained in the current game board array
-  const checkForWinningCombination = horizontalWinOne.every((value) =>
-    playerOneIndexes.includes(value)
-  );
-
-  if (checkForWinningCombination === true) {
-    alert("Player one has won!");
-  }
+  // Re-usable function for checking multiple winning patterns
+  return array.every((value) => playerOneIndexes.includes(value));
 }
