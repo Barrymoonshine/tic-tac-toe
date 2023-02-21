@@ -1,15 +1,13 @@
 const gameBoardContainer = document.getElementById("game-board-container");
 let count = 0;
-
-function getAllIndexes() {
-  const currentArray = gameBoard.gameBoardArray;
-  currentArray.reduce((array, element, index) => {
-    if (element === "X") {
-      array.push(index);
-    }
-    return array;
-  }, []);
-}
+const horizontalWinOne = [0, 1, 2];
+const horizontalWinTwo = [3, 4, 5];
+const horizontalWinThree = [6, 7, 8];
+const verticalWinOne = [0, 3, 6];
+const verticalWinTwo = [1, 4, 7];
+const verticalWinThree = [2, 5, 8];
+const diagonalWinOne = [0, 4, 8];
+const diagonalWinTwo = [2, 4, 6];
 
 // Module pattern to generate game board array
 const gameBoard = (function () {
@@ -31,7 +29,6 @@ function handleGameFlow(e) {
   // Checks if a square has already been used
   incrementByOne();
   const targetSquare = document.getElementById(e.target.id);
-  console.log(targetSquare);
   const index = targetSquare.id;
   if (targetSquare.textContent == "X" || targetSquare.textContent == "O") {
   } else if (count % 2 !== 0) {
@@ -60,7 +57,24 @@ const incrementByOne = () => {
 };
 
 function checkForWinner() {
-  // Checks if the current gameBoardArray matches a winning pattern and returns,
-  // a congratulations message
-  getAllIndexes();
+  const currentArray = gameBoard.gameBoardArray;
+
+  // Loops through the game board array,
+  // And returns the index value for player ones marker
+  const playerOneIndexes = currentArray.reduce((array, element, index) => {
+    if (element === "X") {
+      array.push(index);
+    }
+    return array;
+  }, []);
+
+  // Loops through the winning index values to check,
+  // if they are contained in the current game board array
+  const checkForWinningCombination = horizontalWinOne.every((value) =>
+    playerOneIndexes.includes(value)
+  );
+
+  if (checkForWinningCombination === true) {
+    alert("Player one has won!");
+  }
 }
