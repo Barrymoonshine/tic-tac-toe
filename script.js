@@ -64,7 +64,14 @@ function checkForWinner() {
   // Loops through the game board array,
   // And returns the index value for player ones marker
   const playerOneIndexes = currentArray.reduce((array, element, index) => {
-    if (element === "X") {
+    if (element === playerOne.marker) {
+      array.push(index);
+    }
+    return array;
+  }, []);
+
+  const playerTwoIndexes = currentArray.reduce((array, element, index) => {
+    if (element === playerTwo.marker) {
       array.push(index);
     }
     return array;
@@ -73,6 +80,12 @@ function checkForWinner() {
   winningPatterns.forEach((array) => {
     if (multipleInArray(playerOneIndexes, array) === true) {
       alert("Player one has won!");
+    }
+  });
+
+  winningPatterns.forEach((array) => {
+    if (multipleInArray(playerTwoIndexes, array) === true) {
+      alert("Player two has won!");
     }
   });
 }
