@@ -11,6 +11,27 @@
   </head>
   Tic Tac Toe
   <body>
-    <div id="game-board-container"></div>
+    <main>
+      <div id="game-board-container"></div>
+      <div class="start-game-button">
+        <button id="modal-button">Start game</button>
+      </div>
+      <div id="new-game-modal" class="modal">
+      <div class="modal-content">
+        <form id="new-book-form">
+          <h2 class="form-title">Add a book</h2>
+          <ul>
+            <li>
+              <label for="book-title"></label>
+              <input
+                type="text"
+                id="title"
+                name="book-title"
+                placeholder="Title"
+                minlength="1"
+                required
+              />
+            </li>
+    </main>
   </body>
 </html>

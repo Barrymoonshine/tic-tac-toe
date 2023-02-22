@@ -31,8 +31,8 @@ const playerTwo = generatePlayers("playerTwo", "O");
 
 gameBoardContainer.addEventListener("click", handleGameFlow);
 
-const switchPlayer = (() => {
-  // Module pattern to switch players between rounds
+const getPlayer = (() => {
+  // Module pattern to switch players each round
   let playerCount = 0;
   function changeBy(val) {
     playerCount += val;
@@ -50,19 +50,20 @@ const switchPlayer = (() => {
 function handleGameFlow(e) {
   const targetSquare = document.getElementById(e.target.id);
   const index = targetSquare.id;
+
   if (targetSquare.textContent == "X" || targetSquare.textContent == "O") {
-  } else if (switchPlayer.checkPlayer() % 2 === 0) {
+  } else if (getPlayer.checkPlayer() % 2 === 0) {
     targetSquare.textContent = playerOne.marker;
     generateGameBoard.gameBoardArray[index] = playerOne.marker;
   } else {
     targetSquare.textContent = playerTwo.marker;
     generateGameBoard.gameBoardArray[index] = playerTwo.marker;
   }
-  checkForWinner();
-  switchPlayer.switch();
+  checkResults();
+  getPlayer.switch();
 }
 
-function checkForWinner() {
+function checkResults() {
   const currentArray = generateGameBoard.gameBoardArray;
   // Loops through the game board array,
   // And returns the index values for both players in a nested array
@@ -77,13 +78,16 @@ function checkForWinner() {
     },
     [[], []]
   );
+
   // Compares each players index position with the winning patterns
   // Displays message if there is a winner
   winningPatterns.forEach((array) => {
-    if (checkWinningPattern(returnIndexes[0], array) === true) {
+    if (checkWinningPattern(returnIndexes[0], array)) {
       alert("Player one has won!");
-    } else if (checkWinningPattern(returnIndexes[1], array) === true) {
+    } else if (checkWinningPattern(returnIndexes[1], array)) {
       alert("Player two has won!");
+    } else if (returnIndexes[0].length === 5) {
+      alert("It's a draw!");
     }
   });
 }
