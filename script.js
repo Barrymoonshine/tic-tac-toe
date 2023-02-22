@@ -63,7 +63,7 @@ function checkForWinner() {
   const currentArray = gameBoard.gameBoardArray;
 
   // Loops through the game board array,
-  // And returns the index value for player ones marker
+  // And returns the index values for both players in a nested array
   const returnIndexes = currentArray.reduce(
     (array, element, index) => {
       if (element === playerOne.marker) {
@@ -76,24 +76,20 @@ function checkForWinner() {
     [[], []]
   );
 
-  console.log(returnIndexes);
-
-  // winningPatterns.forEach((array) => {
-  //   if (multipleInArray(playerOneIndexes, array) === true) {
-  //     alert("Player one has won!");
-  //   }
-  // });
-
-  // winningPatterns.forEach((array) => {
-  //   if (multipleInArray(playerTwoIndexes, array) === true) {
-  //     alert("Player two has won!");
-  //   }
-  // });
+  // Loops through winning index positions
+  // Returns congratulations message to winner
+  winningPatterns.forEach((array) => {
+    if (multipleInArray(returnIndexes[0], array) === true) {
+      alert("Player one has won!");
+    } else if (multipleInArray(returnIndexes[1], array) === true) {
+      alert("Player two has won!");
+    }
+  });
 }
 
-// function multipleInArray(playerIndexes, array) {
-//   // Loops through the winning index values to check,
-//   // if they are contained in the current game board array
-//   // Re-usable function for checking multiple winning patterns
-//   return array.every((value) => playerIndexes.includes(value));
-// }
+function multipleInArray(indexes, array) {
+  // Loops through the winning index values to check,
+  // if they are contained in the current game board array
+  // Re-usable function for checking multiple winning patterns
+  return array.every((value) => indexes.includes(value));
+}
