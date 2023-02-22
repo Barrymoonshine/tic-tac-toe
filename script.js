@@ -11,8 +11,14 @@ const winningPatterns = [
   [2, 4, 6],
 ];
 
-// Module pattern to generate game board array
+// Module pattern to generate the game board and array
 const gameBoard = (function () {
+  for (i = 0; i < 9; i++) {
+    const boardSquare = document.createElement("div");
+    boardSquare.className = "board-squares";
+    boardSquare.id = i;
+    gameBoardContainer.appendChild(boardSquare);
+  }
   const gameBoardArray = ["", "", "", "", "", "", "", "", ""];
   return {
     gameBoardArray,
@@ -44,24 +50,12 @@ function handleGameFlow(e) {
   incrementByOne();
 }
 
-renderGameBoard();
-
 const incrementByOne = () => {
   count++;
 };
 
-function renderGameBoard() {
-  for (i = 0; i < 9; i++) {
-    const boardSquare = document.createElement("div");
-    boardSquare.className = "board-squares";
-    boardSquare.id = i;
-    gameBoardContainer.appendChild(boardSquare);
-  }
-}
-
 function checkForWinner() {
   const currentArray = gameBoard.gameBoardArray;
-
   // Loops through the game board array,
   // And returns the index values for both players in a nested array
   const returnIndexes = currentArray.reduce(
@@ -75,7 +69,6 @@ function checkForWinner() {
     },
     [[], []]
   );
-
   // Loops through winning index positions
   // Returns congratulations message to winner
   winningPatterns.forEach((array) => {
