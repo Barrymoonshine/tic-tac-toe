@@ -27,13 +27,13 @@ const playerTwo = playerFactory("playerTwo", "O");
 gameBoardContainer.addEventListener("click", handleGameFlow);
 
 function handleGameFlow(e) {
-  // Checks which player's using a counter, odd is playerOne, odd playerTwo
+  // Checks which player's using a counter, even is playerOne, odd playerTwo
   // Checks if a square has already been used
-  incrementByOne();
+
   const targetSquare = document.getElementById(e.target.id);
   const index = targetSquare.id;
   if (targetSquare.textContent == "X" || targetSquare.textContent == "O") {
-  } else if (count % 2 !== 0) {
+  } else if (count % 2 === 0) {
     targetSquare.textContent = playerOne.marker;
     gameBoard.gameBoardArray[index] = playerOne.marker;
   } else {
@@ -41,7 +41,14 @@ function handleGameFlow(e) {
     gameBoard.gameBoardArray[index] = playerTwo.marker;
   }
   checkForWinner();
+  incrementByOne();
 }
+
+renderGameBoard();
+
+const incrementByOne = () => {
+  count++;
+};
 
 function renderGameBoard() {
   for (i = 0; i < 9; i++) {
@@ -52,47 +59,41 @@ function renderGameBoard() {
   }
 }
 
-renderGameBoard();
-
-const incrementByOne = () => {
-  count++;
-};
-
 function checkForWinner() {
   const currentArray = gameBoard.gameBoardArray;
 
   // Loops through the game board array,
   // And returns the index value for player ones marker
-  const playerOneIndexes = currentArray.reduce((array, element, index) => {
-    if (element === playerOne.marker) {
-      array.push(index);
-    }
-    return array;
-  }, []);
+  const returnIndexes = currentArray.reduce(
+    (array, element, index) => {
+      if (element === playerOne.marker) {
+        array[0].push(index);
+      } else if (element === playerTwo.marker) {
+        array[1].push(index);
+      }
+      return array;
+    },
+    [[], []]
+  );
 
-  const playerTwoIndexes = currentArray.reduce((array, element, index) => {
-    if (element === playerTwo.marker) {
-      array.push(index);
-    }
-    return array;
-  }, []);
+  console.log(returnIndexes);
 
-  winningPatterns.forEach((array) => {
-    if (multipleInArray(playerOneIndexes, array) === true) {
-      alert("Player one has won!");
-    }
-  });
+  // winningPatterns.forEach((array) => {
+  //   if (multipleInArray(playerOneIndexes, array) === true) {
+  //     alert("Player one has won!");
+  //   }
+  // });
 
-  winningPatterns.forEach((array) => {
-    if (multipleInArray(playerTwoIndexes, array) === true) {
-      alert("Player two has won!");
-    }
-  });
+  // winningPatterns.forEach((array) => {
+  //   if (multipleInArray(playerTwoIndexes, array) === true) {
+  //     alert("Player two has won!");
+  //   }
+  // });
 }
 
-function multipleInArray(playerOneIndexes, array) {
-  // Loops through the winning index values to check,
-  // if they are contained in the current game board array
-  // Re-usable function for checking multiple winning patterns
-  return array.every((value) => playerOneIndexes.includes(value));
-}
+// function multipleInArray(playerIndexes, array) {
+//   // Loops through the winning index values to check,
+//   // if they are contained in the current game board array
+//   // Re-usable function for checking multiple winning patterns
+//   return array.every((value) => playerIndexes.includes(value));
+// }
