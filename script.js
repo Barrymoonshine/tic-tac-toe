@@ -14,10 +14,9 @@ const winningPatterns = [
 // Module pattern to generate the game board and array
 const gameBoard = (function () {
   for (i = 0; i < 9; i++) {
-    const boardSquare = document.createElement("div");
-    boardSquare.className = "board-squares";
-    boardSquare.id = i;
-    gameBoardContainer.appendChild(boardSquare);
+    gameBoardContainer.innerHTML += String.raw`
+    <div class="board-squares" id='${i}'>
+    `;
   }
   const gameBoardArray = ["", "", "", "", "", "", "", "", ""];
   return {
