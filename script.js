@@ -1,7 +1,14 @@
 const gameBoardContainer = document.getElementById("game-board-container");
 const modal = document.getElementById("new-game-modal");
 const startGameButton = document.getElementById("modal-button");
-const newBookForm = document.getElementById("new-book-form");
+const submitNames = document.getElementById("player-names-form");
+
+submitNames.addEventListener("submit", startGame);
+
+function startGame(e) {
+  e.preventDefault();
+  gameBoardContainer.style.display = "grid";
+}
 
 const generateGameBoard = (() => {
   // Module pattern and loop to generate the game board and array
@@ -23,10 +30,9 @@ const playerOne = generatePlayers("playerOne", "X");
 const playerTwo = generatePlayers("playerTwo", "O");
 
 gameBoardContainer.addEventListener("click", (e) => {
-  // Checks if the target id only contains numbers and is therefore game board cell
+  // Checks that the target id only contains numbers and is therefore a game board cell
   if (String(e.target.id).match(/^[0-9]+$/)) {
     handleGameFlow(e);
-  } else {
   }
 });
 
@@ -49,7 +55,6 @@ const getPlayer = (() => {
 function handleGameFlow(e) {
   const targetSquare = document.getElementById(e.target.id);
   const index = targetSquare.id;
-
   if (targetSquare.textContent == "X" || targetSquare.textContent == "O") {
   } else if (getPlayer.checkPlayer() % 2 === 0) {
     targetSquare.textContent = playerOne.marker;
@@ -107,7 +112,6 @@ function checkResults() {
 function checkWinningPattern(indexes, array) {
   // Loops through the winning index values to check,
   // if they are contained in the current game board array
-  // Re-usable function for checking multiple winning patterns
   return array.every((value) => indexes.includes(value));
 }
 
