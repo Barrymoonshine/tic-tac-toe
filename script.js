@@ -1,13 +1,16 @@
+const gameAreaContainer = document.getElementById("game-area-container");
 const gameBoardContainer = document.getElementById("game-board-container");
+const playerNameDisplay = document.getElementById("player-name-display");
 const modal = document.getElementById("new-game-modal");
 const startGameButton = document.getElementById("modal-button");
-const submitNames = document.getElementById("player-names-form");
+const submitNamesForm = document.getElementById("player-names-form");
 
-submitNames.addEventListener("submit", startGame);
+submitNamesForm.addEventListener("submit", displayGameElements);
 
-function startGame(e) {
+function displayGameElements(e) {
   e.preventDefault();
-  gameBoardContainer.style.display = "grid";
+  gameAreaContainer.style.display = "flex";
+  modal.style.display = "none";
 }
 
 const generateGameBoard = (() => {
@@ -26,8 +29,6 @@ const generateGameBoard = (() => {
 
 // Factory function to generate players
 const generatePlayers = (name, marker) => ({ name, marker });
-const playerOne = generatePlayers("playerOne", "X");
-const playerTwo = generatePlayers("playerTwo", "O");
 
 gameBoardContainer.addEventListener("click", (e) => {
   // Checks that the target id only contains numbers and is therefore a game board cell
@@ -55,19 +56,30 @@ const getPlayer = (() => {
 function handleGameFlow(e) {
   const targetSquare = document.getElementById(e.target.id);
   const index = targetSquare.id;
+  const playerOneName = document.getElementById("player-one-name").value;
+  const playerTwoName = document.getElementById("player-two-name").value;
+  const playerOne = generatePlayers(playerOneName, "X");
+  const playerTwo = generatePlayers(playerTwoName, "O");
+  // Stops players from playing in cells already taken
   if (targetSquare.textContent == "X" || targetSquare.textContent == "O") {
   } else if (getPlayer.checkPlayer() % 2 === 0) {
+    playerNameDisplay.innerHTML = String.raw`
+    ${playerOneName}'s turn
+    `;
     targetSquare.textContent = playerOne.marker;
     generateGameBoard.gameBoardArray[index] = playerOne.marker;
   } else {
+    playerNameDisplay.innerHTML = String.raw`
+    ${playerTwoName}' turn 
+    `;
     targetSquare.textContent = playerTwo.marker;
     generateGameBoard.gameBoardArray[index] = playerTwo.marker;
   }
-  checkResults();
+  checkForGameOver();
   getPlayer.switch();
 }
 
-function checkResults() {
+function checkForGameOver() {
   const currentArray = generateGameBoard.gameBoardArray;
   const winningPatterns = [
     [0, 1, 2],
@@ -83,9 +95,9 @@ function checkResults() {
   // And returns the index values for both players in a nested array
   const returnIndexes = currentArray.reduce(
     (array, element, index) => {
-      if (element === playerOne.marker) {
+      if (element === "X") {
         array[0].push(index);
-      } else if (element === playerTwo.marker) {
+      } else if (element === "O") {
         array[1].push(index);
       }
       return array;
@@ -96,10 +108,10 @@ function checkResults() {
   // Compares each players index position with the winning patterns
   // Displays message if there is a winner or draw
   winningPatterns.forEach((array) => {
-    if (checkWinningPattern(returnIndexes[0], array)) {
+    if (compareWithWinningPattern(returnIndexes[0], array)) {
       alert("Player one has won!");
       generateGameBoard();
-    } else if (checkWinningPattern(returnIndexes[1], array)) {
+    } else if (compareWithWinningPattern(returnIndexes[1], array)) {
       alert("Player two has won!");
       generateGameBoard();
     } else if (returnIndexes[0].length === 5) {
@@ -109,7 +121,7 @@ function checkResults() {
   });
 }
 
-function checkWinningPattern(indexes, array) {
+function compareWithWinningPattern(indexes, array) {
   // Loops through the winning index values to check,
   // if they are contained in the current game board array
   return array.every((value) => indexes.includes(value));
@@ -118,10 +130,5 @@ function checkWinningPattern(indexes, array) {
 // Modal event listeners
 startGameButton.addEventListener("click", () => {
   modal.style.display = "flex";
-  body.style.backgroundColor = "rgba (0,0,0,0.4)";
-});
-window.addEventListener("click", (e) => {
-  if (e.target === modal) {
-    modal.style.display = "none";
-  }
+  startGameButton.style.display = "none";
 });

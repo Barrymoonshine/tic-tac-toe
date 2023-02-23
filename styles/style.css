@@ -12,9 +12,29 @@ ul {
   list-style: none;
 }
 
+#new-game-modal {
+  display: none;
+}
+
+.modal-content {
+  display: flex;
+  flex-direction: column;
+}
+
+label,
+input {
+  display: flex;
+  flex-direction: column;
+}
+
+#game-area-container {
+  display: none;
+  flex-direction: column;
+}
+
 #game-board-container {
   height: 100vh;
-  display: none;
+  display: grid;
   grid-template-columns: repeat(3, 100px);
   grid-template-rows: repeat(3, 100px);
   justify-content: center;
