@@ -1,34 +1,50 @@
-const gameAreaContainer = document.getElementById("game-area-container");
-const gameBoardContainer = document.getElementById("game-board-container");
-const playerNameDisplay = document.getElementById("player-name-display");
-const modal = document.getElementById("new-game-modal");
 const startGameButton = document.getElementById("modal-button");
+const modal = document.getElementById("new-game-modal");
 const submitNamesForm = document.getElementById("player-names-form");
+const gameAreaContainer = document.getElementById("game-area-container");
+const resetGameButton = document.getElementById("reset-button");
+const playerNameDisplay = document.getElementById("player-name-display");
+const gameBoardContainer = document.getElementById("game-board-container");
 
-submitNamesForm.addEventListener("submit", displayGameElements);
-
-function displayGameElements(e) {
+const handleForm = (e) => {
   e.preventDefault();
+  const playerOneName = document.getElementById("player-one-name").value;
+  playerNameDisplay.innerHTML = String.raw`
+    ${playerOneName}'s turn
+    `;
+  generateGameBoard.generateNewBoard();
   gameAreaContainer.style.display = "flex";
   modal.style.display = "none";
-}
+};
+
+submitNamesForm.addEventListener("submit", handleForm);
 
 const generateGameBoard = (() => {
   // Module pattern and loop to generate the game board and array
   const gameBoardArray = [];
-  for (i = 0; i < 9; i++) {
-    gameBoardContainer.innerHTML += String.raw`
+  const generateNewBoard = () => {
+    for (i = 0; i < 9; i++) {
+      gameBoardContainer.innerHTML += String.raw`
     <div class="board-squares" id='${i}'>
     `;
-    gameBoardArray.push("");
-  }
+      gameBoardArray.push("");
+    }
+  };
   return {
+    generateNewBoard,
     gameBoardArray,
   };
 })();
 
-// Factory function to generate players
-const generatePlayers = (name, marker) => ({ name, marker });
+function generateNewGame() {
+  while (gameBoardContainer.lastElementChild) {
+    gameBoardContainer.removeChild(gameBoardContainer.lastElementChild);
+  }
+  generateGameBoard.generateNewBoard();
+  getPlayer.resetCount();
+}
+
+resetGameButton.addEventListener("click", generateNewGame);
 
 gameBoardContainer.addEventListener("click", (e) => {
   // Checks that the target id only contains numbers and is therefore a game board cell
@@ -47,6 +63,9 @@ const getPlayer = (() => {
     switch() {
       changeBy(1);
     },
+    resetCount() {
+      playerCount = 0;
+    },
     checkPlayer() {
       return playerCount;
     },
@@ -54,26 +73,24 @@ const getPlayer = (() => {
 })();
 
 function handleGameFlow(e) {
-  const targetSquare = document.getElementById(e.target.id);
-  const index = targetSquare.id;
   const playerOneName = document.getElementById("player-one-name").value;
   const playerTwoName = document.getElementById("player-two-name").value;
-  const playerOne = generatePlayers(playerOneName, "X");
-  const playerTwo = generatePlayers(playerTwoName, "O");
-  // Stops players from playing in cells already taken
+  const targetSquare = document.getElementById(e.target.id);
+  const index = targetSquare.id;
+  // Stops markers being placed in cells already taken
   if (targetSquare.textContent == "X" || targetSquare.textContent == "O") {
   } else if (getPlayer.checkPlayer() % 2 === 0) {
     playerNameDisplay.innerHTML = String.raw`
-    ${playerOneName}'s turn
+    ${playerTwoName}'s turn
     `;
-    targetSquare.textContent = playerOne.marker;
-    generateGameBoard.gameBoardArray[index] = playerOne.marker;
+    targetSquare.textContent = "X";
+    generateGameBoard.gameBoardArray[index] = "X";
   } else {
     playerNameDisplay.innerHTML = String.raw`
-    ${playerTwoName}' turn 
+    ${playerOneName}' turn 
     `;
-    targetSquare.textContent = playerTwo.marker;
-    generateGameBoard.gameBoardArray[index] = playerTwo.marker;
+    targetSquare.textContent = "O";
+    generateGameBoard.gameBoardArray[index] = "O";
   }
   checkForGameOver();
   getPlayer.switch();
@@ -108,20 +125,20 @@ function checkForGameOver() {
   // Compares each players index position with the winning patterns
   // Displays message if there is a winner or draw
   winningPatterns.forEach((array) => {
-    if (compareWithWinningPattern(returnIndexes[0], array)) {
+    if (checkForWinningPattern(returnIndexes[0], array)) {
       alert("Player one has won!");
-      generateGameBoard();
-    } else if (compareWithWinningPattern(returnIndexes[1], array)) {
+      generateNewGame();
+    } else if (checkForWinningPattern(returnIndexes[1], array)) {
       alert("Player two has won!");
-      generateGameBoard();
+      generateNewGame();
     } else if (returnIndexes[0].length === 5) {
       alert("It's a draw!");
-      generateGameBoard();
+      generateNewGame();
     }
   });
 }
 
-function compareWithWinningPattern(indexes, array) {
+function checkForWinningPattern(indexes, array) {
   // Loops through the winning index values to check,
   // if they are contained in the current game board array
   return array.every((value) => indexes.includes(value));
