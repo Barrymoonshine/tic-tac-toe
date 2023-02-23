@@ -9,29 +9,45 @@
     <link rel="stylesheet" href="styles/normalize.css" />
     <script src="script.js" defer></script>
   </head>
-  Tic Tac Toe
+  <h1>Tic Tac Toe</h1>
   <body>
     <main>
-      <div id="game-board-container"></div>
       <div class="start-game-button">
         <button id="modal-button">Start game</button>
       </div>
       <div id="new-game-modal" class="modal">
-      <div class="modal-content">
-        <form id="new-book-form">
-          <h2 class="form-title">Add a book</h2>
-          <ul>
-            <li>
-              <label for="book-title"></label>
-              <input
-                type="text"
-                id="title"
-                name="book-title"
-                placeholder="Title"
-                minlength="1"
-                required
-              />
-            </li>
+        <div class="modal-content">
+          <form id="player-names-form">
+            <ul>
+              <li>
+                <label for="player one's name">Player X name</label>
+                <input
+                  type="text"
+                  id="player-one-name"
+                  name="player-one-name"
+                  minlength="1"
+                  required
+                />
+              </li>
+              <li>
+                <label for="player two's name">Player O name</label>
+                <input
+                  type="text"
+                  id="player-two-name"
+                  name="player-two-name"
+                  minlength="1"
+                  required
+                />
+              </li>
+              <li class="button">
+                <label for="Submit both players name"></label>
+                <button id="submit-button" type="submit">Submit</button>
+              </li>
+            </ul>
+          </form>
+        </div>
+      </div>
+      <div id="game-board-container"></div>
     </main>
   </body>
 </html>

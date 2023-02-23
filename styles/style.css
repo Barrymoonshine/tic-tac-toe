@@ -2,6 +2,16 @@
   margin: 0px;
 }
 
+body {
+  display: grid;
+  flex-direction: column;
+  text-align: center;
+}
+
+ul {
+  list-style: none;
+}
+
 #game-board-container {
   height: 100vh;
   display: grid;
