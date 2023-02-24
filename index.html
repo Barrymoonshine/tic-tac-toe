@@ -15,8 +15,8 @@
     <link rel="stylesheet" href="styles/normalize.css" />
     <script src="script.js" defer></script>
   </head>
-  <h1>Tic Tac Toe</h1>
   <body>
+    <div class="header">Tic-Tac-Toe</div>
     <main>
       <div class="start-game-button">
         <button id="modal-button">Start game</button>
@@ -56,8 +56,24 @@
       <div id="game-area-container">
         <button id="reset-button">Reset</button>
         <div id="player-name-display"></div>
-        <div id="game-board-container"></div>
+        <div id="game-board-container">
+          <div id="square1" class="board-squares" data-index-number="0"></div>
+          <div id="square2" class="board-squares" data-index-number="1"></div>
+          <div id="square3" class="board-squares" data-index-number="2"></div>
+          <div id="square4" class="board-squares" data-index-number="3"></div>
+          <div id="square5" class="board-squares" data-index-number="4"></div>
+          <div id="square6" class="board-squares" data-index-number="5"></div>
+          <div id="square7" class="board-squares" data-index-number="6"></div>
+          <div id="square8" class="board-squares" data-index-number="7"></div>
+          <div id="square9" class="board-squares" data-index-number="8"></div>
       </div>
     </main>
+    <div class="footer">
+      <p>
+        © Made by
+        <a href="https://github.com/Barrymoonshine">Barry Moonshine</a> for
+        <a href="https://www.theodinproject.com/">The Odin Project</a>
+      </p>
+    </div>
   </body>
 </html>

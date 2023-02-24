@@ -30,15 +30,14 @@ const generateGameBoard = (() => {
   const gameBoardArray = [];
   const generateNewBoard = () => {
     for (i = 0; i < 9; i++) {
-      gameBoardContainer.innerHTML += String.raw`
-    <div class="board-squares" id='${i}'>
-    `;
       gameBoardArray.push("");
     }
-    for (i of boardSquares) {
-      i.addEventListener("click", handleGameListener);
-    }
   };
+
+  for (i of boardSquares) {
+    i.addEventListener("click", handleGameListener);
+  }
+
   return {
     generateNewBoard,
     gameBoardArray,
@@ -82,22 +81,25 @@ const getPlayer = (() => {
 function handleGameFlow(e) {
   const playerOneName = document.getElementById("player-one-name").value;
   const playerTwoName = document.getElementById("player-two-name").value;
-  const targetSquare = document.getElementById(e.target.id);
-  const index = targetSquare.id;
+
+  const squareIndex = e.target.getAttribute("data-index-number");
+
+  const square = document.getElementById(e.target.id);
+
   // Stops markers being placed in cells already taken
-  if (targetSquare.textContent == "X" || targetSquare.textContent == "O") {
+  if (square.textContent == "X" || square.textContent == "O") {
   } else if (getPlayer.checkPlayer() % 2 === 0) {
     playerNameDisplay.innerHTML = String.raw`
     ${playerTwoName}'s turn
     `;
-    targetSquare.textContent = "X";
-    generateGameBoard.gameBoardArray[index] = "X";
+    square.textContent = "X";
+    generateGameBoard.gameBoardArray[squareIndex] = "X";
   } else {
     playerNameDisplay.innerHTML = String.raw`
     ${playerOneName}' turn 
     `;
-    targetSquare.textContent = "O";
-    generateGameBoard.gameBoardArray[index] = "O";
+    square.textContent = "O";
+    generateGameBoard.gameBoardArray[squareIndex] = "O";
   }
   checkForGameOver();
   getPlayer.switch();

@@ -2,24 +2,50 @@
   margin: 0px;
 }
 
-body {
-  font-family: "Mynerve", cursive;
-  display: grid;
-  flex-direction: column;
-  text-align: center;
-}
-
 ul {
   list-style: none;
 }
 
-#new-game-modal {
-  display: none;
+button {
+  padding: 20px;
+  background-color: black;
+  border-radius: 5px;
+  color: #f1f5f9;
 }
 
-.modal-content {
+button:hover {
+  color: white;
+  box-shadow: 0px 0px 10px;
+}
+
+body {
+  font-family: "Mynerve", cursive;
+  color: #f1f5f9;
+  background-image: url(images/asfalt-light.png);
+  background-color: #000000;
   display: flex;
   flex-direction: column;
+  text-align: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+}
+
+#modal-button,
+#reset-button {
+  font-size: 20px;
+}
+
+.header {
+  font-size: 70px;
+  font-weight: bold;
+  padding: 50px 0 50px 0;
+}
+
+.modal {
+  display: none;
+  align-items: center;
+  justify-content: center;
 }
 
 label,
@@ -28,22 +54,98 @@ input {
   flex-direction: column;
 }
 
+label {
+  padding: 20px 0 20px 0;
+  font-size: 30px;
+}
+
+input {
+  padding: 10px;
+  border-radius: 5px;
+}
+
 #game-area-container {
   display: none;
   flex-direction: column;
+  gap: 50px;
+  align-items: center;
+  justify-content: center;
+}
+
+#reset-button {
+  padding: 20px 40px 20px 40px;
+}
+
+#player-name-display {
+  font-size: 30px;
 }
 
 #game-board-container {
-  height: 100vh;
+  padding-top: 20px;
   display: grid;
-  grid-template-columns: repeat(3, 100px);
-  grid-template-rows: repeat(3, 100px);
+  grid-template-columns: repeat(3, auto);
+  grid-template-rows: repeat(3, auto);
+  grid-gap: 0;
   justify-content: center;
   align-content: center;
 }
 
+#square1 {
+  border-left: none;
+  border-top: none;
+}
+
+#square2 {
+  border-top: none;
+}
+
+#square3 {
+  border-top: none;
+  border-right: none;
+}
+
+#square4 {
+  border-left: none;
+}
+
+#square6 {
+  border-right: none;
+}
+
+#square7 {
+  border-left: none;
+  border-bottom: none;
+}
+
+#square8 {
+  border-bottom: none;
+}
+
+#square9 {
+  border-right: none;
+  border-bottom: none;
+}
+
 .board-squares {
-  width: 100px;
-  height: 100px;
-  border: 1px solid black;
+  border: 2px solid rgba(255, 255, 255, 0.887);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 125px;
+  height: 125px;
+  font-size: 30px;
+  font-weight: bold;
+}
+
+.board-squares:hover {
+  border: 2px solid aqua;
+}
+
+.footer {
+  font-size: 15px;
+  padding: 50px 0 20px 0;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: auto;
 }
