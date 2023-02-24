@@ -49,6 +49,7 @@ function generateNewGame() {
   while (gameBoardContainer.lastElementChild) {
     gameBoardContainer.removeChild(gameBoardContainer.lastElementChild);
   }
+  generateGameBoard.gameBoardArray = [];
   generateGameBoard.generateNewBoard();
   getPlayer.resetCount();
   const playerOneName = document.getElementById("player-one-name").value;
