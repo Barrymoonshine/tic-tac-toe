@@ -3,6 +3,7 @@
 }
 
 body {
+  font-family: "Mynerve", cursive;
   display: grid;
   flex-direction: column;
   text-align: center;
