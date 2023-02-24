@@ -5,6 +5,12 @@ const gameAreaContainer = document.getElementById("game-area-container");
 const resetGameButton = document.getElementById("reset-button");
 const playerNameDisplay = document.getElementById("player-name-display");
 const gameBoardContainer = document.getElementById("game-board-container");
+const boardSquares = document.getElementsByClassName("board-squares");
+
+const handleGameListener = (e) => {
+  // Checks that the target id only contains numbers and is therefore a game board cell
+  handleGameFlow(e);
+};
 
 const handleForm = (e) => {
   e.preventDefault();
@@ -29,6 +35,9 @@ const generateGameBoard = (() => {
     `;
       gameBoardArray.push("");
     }
+    for (i of boardSquares) {
+      i.addEventListener("click", handleGameListener);
+    }
   };
   return {
     generateNewBoard,
@@ -42,16 +51,13 @@ function generateNewGame() {
   }
   generateGameBoard.generateNewBoard();
   getPlayer.resetCount();
+  const playerOneName = document.getElementById("player-one-name").value;
+  playerNameDisplay.innerHTML = String.raw`
+    ${playerOneName}'s turn
+    `;
 }
 
 resetGameButton.addEventListener("click", generateNewGame);
-
-gameBoardContainer.addEventListener("click", (e) => {
-  // Checks that the target id only contains numbers and is therefore a game board cell
-  if (String(e.target.id).match(/^[0-9]+$/)) {
-    handleGameFlow(e);
-  }
-});
 
 const getPlayer = (() => {
   // Module pattern to switch players each round using a private variable
@@ -97,6 +103,8 @@ function handleGameFlow(e) {
 }
 
 function checkForGameOver() {
+  const playerOneName = document.getElementById("player-one-name").value;
+  const playerTwoName = document.getElementById("player-two-name").value;
   const currentArray = generateGameBoard.gameBoardArray;
   const winningPatterns = [
     [0, 1, 2],
@@ -126,14 +134,20 @@ function checkForGameOver() {
   // Displays message if there is a winner or draw
   winningPatterns.forEach((array) => {
     if (checkForWinningPattern(returnIndexes[0], array)) {
-      alert("Player one has won!");
-      generateNewGame();
+      playerNameDisplay.innerHTML = String.raw`
+      ${playerOneName} has won
+      `;
+      endGame();
     } else if (checkForWinningPattern(returnIndexes[1], array)) {
-      alert("Player two has won!");
-      generateNewGame();
+      playerNameDisplay.innerHTML = String.raw`
+      ${playerTwoName} has won
+      `;
+      endGame();
     } else if (returnIndexes[0].length === 5) {
-      alert("It's a draw!");
-      generateNewGame();
+      playerNameDisplay.innerHTML = String.raw`
+      It's a draw!
+      `;
+      endGame();
     }
   });
 }
@@ -142,6 +156,13 @@ function checkForWinningPattern(indexes, array) {
   // Loops through the winning index values to check,
   // if they are contained in the current game board array
   return array.every((value) => indexes.includes(value));
+}
+
+function endGame() {
+  for (i of boardSquares) {
+    i.removeEventListener("click", handleGameListener);
+    i.style.cursor = `not-allowed`;
+  }
 }
 
 // Modal event listeners
