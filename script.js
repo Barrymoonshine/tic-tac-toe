@@ -18,6 +18,24 @@ const generatePlayers = (() => {
   };
 })();
 
+const generateRandomComputerMove = (() => {
+  const randomNumber = Math.round(Math.random() * 9);
+  const generateRandomMove = () => randomNumber;
+  return { generateRandomMove };
+})();
+
+const startComputerMode = () => {
+  generatePlayers.playerOneName = 'Human player';
+  generatePlayers.playerTwoName = 'The Super Computer';
+  playerNameDisplay.textContent = `${generatePlayers.playerOneName}'s turn`;
+  selectGameTypeModal.style.display = 'none';
+  gameAreaContainer.style.display = 'flex';
+  gameBoard.generateNewBoard();
+  console.log(generateRandomComputerMove.generateRandomMove());
+};
+
+vsComputerModeButton.addEventListener('click', startComputerMode);
+
 const handleForm = (e) => {
   e.preventDefault();
   const nameOne = document.getElementById('player-one-name').value;
@@ -83,10 +101,10 @@ function handleGameFlow(e) {
     if (currentPositions[indexPosition] !== '') {
     } else if (getPlayerTurn.checkPlayer() % 2 === 0) {
       gameBoard.placeMarker(indexPosition, 'X');
-      playerNameDisplay.textContent = `${generatePlayers.playerOneName}'s turn`;
+      playerNameDisplay.textContent = `${generatePlayers.playerTwoName}'s turn`;
     } else {
       gameBoard.placeMarker(indexPosition, 'O');
-      playerNameDisplay.textContent = `${generatePlayers.playerTwoName}'s turn`;
+      playerNameDisplay.textContent = `${generatePlayers.playerOneName}'s turn`;
     }
   };
 
