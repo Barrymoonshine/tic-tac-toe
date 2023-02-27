@@ -1,14 +1,17 @@
-const startGameButton = document.getElementById("modal-button");
-const modal = document.getElementById("new-game-modal");
-const submitNamesForm = document.getElementById("player-names-form");
-const gameAreaContainer = document.getElementById("game-area-container");
-const resetGameButton = document.getElementById("reset-button");
-const playerNameDisplay = document.getElementById("player-name-display");
-const boardSquares = document.getElementsByClassName("board-squares");
+const startGameButton = document.getElementById('modal-button');
+const selectGameTypeModal = document.getElementById('game-type-modal');
+const twoPlayerModeButton = document.getElementById('2-player-mode');
+const vsComputerModeButton = document.getElementById('vs-computer-mode');
+const twoPlayerFormModal = document.getElementById('new-game-modal');
+const playerNamesForm = document.getElementById('player-names-form');
+const gameAreaContainer = document.getElementById('game-area-container');
+const resetGameButton = document.getElementById('reset-button');
+const playerNameDisplay = document.getElementById('player-name-display');
+const boardSquares = document.getElementsByClassName('board-squares');
 
 const generatePlayers = (() => {
-  const playerOneName = "";
-  const playerTwoName = "";
+  const playerOneName = '';
+  const playerTwoName = '';
   return {
     playerOneName,
     playerTwoName,
@@ -16,27 +19,26 @@ const generatePlayers = (() => {
 })();
 
 const handleForm = (e) => {
-  const nameOne = document.getElementById("player-one-name").value;
-  const nameTwo = document.getElementById("player-two-name").value;
+  e.preventDefault();
+  const nameOne = document.getElementById('player-one-name').value;
+  const nameTwo = document.getElementById('player-two-name').value;
   generatePlayers.playerOneName = nameOne;
   generatePlayers.playerTwoName = nameTwo;
   playerNameDisplay.textContent = `${nameOne}'s turn`;
   gameBoard.generateNewBoard();
-  gameAreaContainer.style.display = "flex";
-  modal.style.display = "none";
-  e.preventDefault();
+  gameAreaContainer.style.display = 'flex';
+  twoPlayerFormModal.style.display = 'none';
 };
 
-submitNamesForm.addEventListener("submit", handleForm);
+playerNamesForm.addEventListener('submit', handleForm);
 
 const gameBoard = (() => {
-  const gameBoardArray = ["", "", "", "", "", "", "", "", ""];
+  const gameBoardArray = ['', '', '', '', '', '', '', '', ''];
   const generateNewBoard = () => {
     for (i of boardSquares) {
-      gameBoardArray[i] = "";
-      i.innerText = "";
+      i.innerText = '';
       i.style.cursor = `pointer`;
-      i.addEventListener("click", handleGameListener);
+      i.addEventListener('click', handleGameListener);
     }
   };
   const placeMarker = (index, marker) => {
@@ -75,37 +77,29 @@ const handleGameListener = (e) => {
 
 function handleGameFlow(e) {
   const currentPositions = gameBoard.getPositions();
-  const indexPosition = e.target.getAttribute("data-index-number");
-  // Places the players marker on the board
+  const indexPosition = e.target.getAttribute('data-index-number');
+  // Places the players marker on the board and displays the next players name
   const playMove = () => {
-    if (currentPositions[indexPosition] !== "") {
+    if (currentPositions[indexPosition] !== '') {
     } else if (getPlayerTurn.checkPlayer() % 2 === 0) {
-      gameBoard.placeMarker(indexPosition, "X");
+      gameBoard.placeMarker(indexPosition, 'X');
+      playerNameDisplay.textContent = `${generatePlayers.playerOneName}'s turn`;
     } else {
-      gameBoard.placeMarker(indexPosition, "O");
+      gameBoard.placeMarker(indexPosition, 'O');
+      playerNameDisplay.textContent = `${generatePlayers.playerTwoName}'s turn`;
     }
   };
 
-  // Generate the board using the current players array positions
+  // Generates the board using the current players array positions
   const generateBoard = () => {
     gameBoard.getPositions().forEach((item, index) => {
       boardSquares[index].innerText = item;
     });
   };
 
-  // Switch the player between rounds
-  const switchPlayer = () => {
-    getPlayerTurn.switch();
-    if (getPlayerTurn.checkPlayer() % 2 === 0) {
-      playerNameDisplay.textContent = `${generatePlayers.playerOneName}'s turn`;
-    } else if (getPlayerTurn.checkPlayer() % 2 !== 0) {
-      playerNameDisplay.textContent = `${generatePlayers.playerTwoName}'s turn`;
-    }
-  };
-
   playMove();
   generateBoard();
-  switchPlayer();
+  getPlayerTurn.switch();
   checkForGameOver(currentPositions);
 }
 
@@ -123,9 +117,9 @@ function checkForGameOver(currentPositions) {
   // Returns each players positions in a separate nested array
   const returnIndexes = currentPositions.reduce(
     (array, element, index) => {
-      if (element === "X") {
+      if (element === 'X') {
         array[0].push(index);
-      } else if (element === "O") {
+      } else if (element === 'O') {
         array[1].push(index);
       }
       return array;
@@ -154,24 +148,29 @@ function checkPatterns(indexes, array) {
 
 function endGame() {
   for (i of boardSquares) {
-    i.removeEventListener("click", handleGameListener);
+    i.removeEventListener('click', handleGameListener);
     i.style.cursor = `not-allowed`;
   }
 }
 
 function resetGame() {
   gameBoard.getPositions().forEach((item, index) => {
-    gameBoard.placeMarker(index, "");
+    gameBoard.placeMarker(index, '');
   });
   gameBoard.generateNewBoard();
   getPlayerTurn.resetCount();
   playerNameDisplay.textContent = `${generatePlayers.playerOneName}'s turn`;
 }
 
-resetGameButton.addEventListener("click", resetGame);
+resetGameButton.addEventListener('click', resetGame);
 
-// Modal event listener
-startGameButton.addEventListener("click", () => {
-  modal.style.display = "flex";
-  startGameButton.style.display = "none";
+// Modal event listeners
+startGameButton.addEventListener('click', () => {
+  selectGameTypeModal.style.display = 'flex';
+  startGameButton.style.display = 'none';
+});
+
+twoPlayerModeButton.addEventListener('click', () => {
+  selectGameTypeModal.style.display = 'none';
+  twoPlayerFormModal.style.display = 'flex';
 });
