@@ -18,36 +18,41 @@ const handleForm = (e) => {
   playerNameDisplay.innerHTML = String.raw`
     ${playerOneName}'s turn
     `;
-  generateGameBoard.generateNewBoard();
+  gameBoard.generateNewBoard();
   gameAreaContainer.style.display = "flex";
   modal.style.display = "none";
 };
 
 submitNamesForm.addEventListener("submit", handleForm);
 
-const generateGameBoard = (() => {
-  // Module pattern and loop to generate the game board and array
+const gameBoard = (() => {
+  // Module pattern and loop to generate and update the game board array
   const gameBoardArray = [];
+
   const generateNewBoard = () => {
-    for (i = 0; i < 9; i++) {
-      gameBoardArray.push("");
-    }
     for (i of boardSquares) {
-      i.addEventListener("click", handleGameListener);
-      i.textContent = "";
+      gameBoardArray.push("");
       i.style.cursor = `pointer`;
+      i.addEventListener("click", handleGameListener);
     }
+  };
+
+  const placeMarker = (index, marker) => {
+    gameBoardArray[index] = marker;
   };
 
   return {
     generateNewBoard,
-    gameBoardArray,
+    placeMarker,
+    getPositions() {
+      return gameBoardArray;
+    },
   };
 })();
 
 function generateNewGame() {
-  generateGameBoard.gameBoardArray = [];
-  generateGameBoard.generateNewBoard();
+  gameBoard.gameBoardArray = [];
+  gameBoard.generateNewBoard();
   getPlayer.resetCount();
   const playerOneName = document.getElementById("player-one-name").value;
   playerNameDisplay.innerHTML = String.raw`
@@ -60,9 +65,9 @@ resetGameButton.addEventListener("click", generateNewGame);
 const getPlayer = (() => {
   // Module pattern to switch players each round using a private variable
   let playerCount = 0;
-  function changeBy(val) {
+  const changeBy = (val) => {
     playerCount += val;
-  }
+  };
   return {
     switch() {
       changeBy(1);
@@ -79,6 +84,13 @@ const getPlayer = (() => {
 function handleGameFlow(e) {
   const playerOneName = document.getElementById("player-one-name").value;
   const playerTwoName = document.getElementById("player-two-name").value;
+  const currentArray = gameBoard.getPositions();
+
+  const generateBoard = () => {
+    currentArray.forEach((item, index) => {
+      boardSquares[index].innerText = item;
+    });
+  };
 
   const squareIndex = e.target.getAttribute("data-index-number");
 
@@ -90,23 +102,30 @@ function handleGameFlow(e) {
     playerNameDisplay.innerHTML = String.raw`
     ${playerTwoName}'s turn
     `;
-    square.textContent = "X";
-    generateGameBoard.gameBoardArray[squareIndex] = "X";
+    gameBoard.placeMarker(squareIndex, "X");
   } else {
     playerNameDisplay.innerHTML = String.raw`
     ${playerOneName}' turn 
     `;
     square.textContent = "O";
-    generateGameBoard.gameBoardArray[squareIndex] = "O";
+    gameBoard.placeMarker(squareIndex, "O");
   }
+  generateBoard();
   checkForGameOver();
   getPlayer.switch();
+  // removeDivs();
 }
+
+// function removeDivs() {
+//   while (gameBoardContainer.lastElementChild) {
+//     gameBoardContainer.removeChild(gameBoardContainer.lastElementChild);
+//   }
+// }
 
 function checkForGameOver() {
   const playerOneName = document.getElementById("player-one-name").value;
   const playerTwoName = document.getElementById("player-two-name").value;
-  const currentArray = generateGameBoard.gameBoardArray;
+  const currentArray = gameBoard.getPositions();
   const winningPatterns = [
     [0, 1, 2],
     [3, 4, 5],
@@ -166,7 +185,7 @@ function endGame() {
   }
 }
 
-// Modal event listeners
+// Modal event listener
 startGameButton.addEventListener("click", () => {
   modal.style.display = "flex";
   startGameButton.style.display = "none";
