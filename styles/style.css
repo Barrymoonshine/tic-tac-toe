@@ -37,7 +37,9 @@ body {
 }
 
 #modal-button,
-#reset-button {
+#reset-button,
+#two-player-mode,
+#vs-computer-mode {
   font-size: 20px;
 }
 
@@ -49,6 +51,7 @@ body {
 
 #game-type-modal {
   display: none;
+  gap: 40px;
 }
 
 .modal {

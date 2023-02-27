@@ -1,6 +1,6 @@
 const startGameButton = document.getElementById('modal-button');
 const selectGameTypeModal = document.getElementById('game-type-modal');
-const twoPlayerModeButton = document.getElementById('2-player-mode');
+const twoPlayerModeButton = document.getElementById('two-player-mode');
 const vsComputerModeButton = document.getElementById('vs-computer-mode');
 const twoPlayerFormModal = document.getElementById('new-game-modal');
 const playerNamesForm = document.getElementById('player-names-form');
