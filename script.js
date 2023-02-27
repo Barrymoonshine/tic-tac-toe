@@ -32,11 +32,12 @@ const generateGameBoard = (() => {
     for (i = 0; i < 9; i++) {
       gameBoardArray.push("");
     }
+    for (i of boardSquares) {
+      i.addEventListener("click", handleGameListener);
+      i.textContent = "";
+      i.style.cursor = `pointer`;
+    }
   };
-
-  for (i of boardSquares) {
-    i.addEventListener("click", handleGameListener);
-  }
 
   return {
     generateNewBoard,
@@ -45,9 +46,6 @@ const generateGameBoard = (() => {
 })();
 
 function generateNewGame() {
-  while (gameBoardContainer.lastElementChild) {
-    gameBoardContainer.removeChild(gameBoardContainer.lastElementChild);
-  }
   generateGameBoard.gameBoardArray = [];
   generateGameBoard.generateNewBoard();
   getPlayer.resetCount();
