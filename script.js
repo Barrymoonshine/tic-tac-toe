@@ -4,12 +4,7 @@ const submitNamesForm = document.getElementById("player-names-form");
 const gameAreaContainer = document.getElementById("game-area-container");
 const resetGameButton = document.getElementById("reset-button");
 const playerNameDisplay = document.getElementById("player-name-display");
-const gameBoardContainer = document.getElementById("game-board-container");
 const boardSquares = document.getElementsByClassName("board-squares");
-
-const handleGameListener = (e) => {
-  handleGameFlow(e);
-};
 
 const generatePlayers = (() => {
   const playerOneName = "";
@@ -25,9 +20,7 @@ const handleForm = (e) => {
   const nameTwo = document.getElementById("player-two-name").value;
   generatePlayers.playerOneName = nameOne;
   generatePlayers.playerTwoName = nameTwo;
-  playerNameDisplay.innerHTML = String.raw`
-    ${nameOne}'s turn
-    `;
+  playerNameDisplay.textContent = `${nameOne}'s turn`;
   gameBoard.generateNewBoard();
   gameAreaContainer.style.display = "flex";
   modal.style.display = "none";
@@ -37,10 +30,11 @@ const handleForm = (e) => {
 submitNamesForm.addEventListener("submit", handleForm);
 
 const gameBoard = (() => {
-  const gameBoardArray = [];
+  const gameBoardArray = ["", "", "", "", "", "", "", "", ""];
   const generateNewBoard = () => {
     for (i of boardSquares) {
-      gameBoardArray.push("");
+      gameBoardArray[i] = "";
+      i.innerText = "";
       i.style.cursor = `pointer`;
       i.addEventListener("click", handleGameListener);
     }
@@ -75,34 +69,44 @@ const getPlayerTurn = (() => {
   };
 })();
 
+const handleGameListener = (e) => {
+  handleGameFlow(e);
+};
+
 function handleGameFlow(e) {
   const currentPositions = gameBoard.getPositions();
   const indexPosition = e.target.getAttribute("data-index-number");
-  // Places the players marker on the board and displays the next players name
+  // Places the players marker on the board
   const playMove = () => {
     if (currentPositions[indexPosition] !== "") {
     } else if (getPlayerTurn.checkPlayer() % 2 === 0) {
-      playerNameDisplay.innerHTML = String.raw`
-    ${generatePlayers.playerTwoName}'s turn
-    `;
       gameBoard.placeMarker(indexPosition, "X");
     } else {
-      playerNameDisplay.innerHTML = String.raw`
-    ${generatePlayers.playerOneName}'s turn 
-    `;
       gameBoard.placeMarker(indexPosition, "O");
     }
   };
-  // Generates the board using the current player's positions
+
+  // Generate the board using the current players array positions
   const generateBoard = () => {
-    currentPositions.forEach((item, index) => {
+    gameBoard.getPositions().forEach((item, index) => {
       boardSquares[index].innerText = item;
     });
   };
+
+  // Switch the player between rounds
+  const switchPlayer = () => {
+    getPlayerTurn.switch();
+    if (getPlayerTurn.checkPlayer() % 2 === 0) {
+      playerNameDisplay.textContent = `${generatePlayers.playerOneName}'s turn`;
+    } else if (getPlayerTurn.checkPlayer() % 2 !== 0) {
+      playerNameDisplay.textContent = `${generatePlayers.playerTwoName}'s turn`;
+    }
+  };
+
   playMove();
   generateBoard();
+  switchPlayer();
   checkForGameOver(currentPositions);
-  getPlayerTurn.switch();
 }
 
 function checkForGameOver(currentPositions) {
@@ -130,18 +134,14 @@ function checkForGameOver(currentPositions) {
   );
   // Loops through each players positions to look for a winner or draw
   winningPatterns.forEach((array) => {
-    if (
-      checkPatterns(returnIndexes[0], array) ||
-      checkPatterns(returnIndexes[1], array)
-    ) {
-      playerNameDisplay.innerHTML = String.raw`
-      ${generatePlayers.playerTwoName} has won
-      `;
+    if (checkPatterns(returnIndexes[0], array)) {
+      playerNameDisplay.textContent = `${generatePlayers.playerOneName} has won!`;
+      endGame();
+    } else if (checkPatterns(returnIndexes[1], array)) {
+      playerNameDisplay.textContent = `${generatePlayers.playerTwoName} has won!`;
       endGame();
     } else if (returnIndexes[0].length === 5) {
-      playerNameDisplay.innerHTML = String.raw`
-      It's a draw!
-      `;
+      playerNameDisplay.textContent = `It's a draw!`;
       endGame();
     }
   });
@@ -159,17 +159,16 @@ function endGame() {
   }
 }
 
-function generateNewGame() {
-  gameBoard.gameBoardArray = [];
+function resetGame() {
+  gameBoard.getPositions().forEach((item, index) => {
+    gameBoard.placeMarker(index, "");
+  });
   gameBoard.generateNewBoard();
   getPlayerTurn.resetCount();
-  const playerOneName = document.getElementById("player-one-name").value;
-  playerNameDisplay.innerHTML = String.raw`
-    ${playerOneName}'s turn
-    `;
+  playerNameDisplay.textContent = `${generatePlayers.playerOneName}'s turn`;
 }
 
-resetGameButton.addEventListener("click", generateNewGame);
+resetGameButton.addEventListener("click", resetGame);
 
 // Modal event listener
 startGameButton.addEventListener("click", () => {
