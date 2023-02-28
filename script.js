@@ -18,12 +18,6 @@ const generatePlayers = (() => {
   };
 })();
 
-const generateRandomComputerMove = (() => {
-  const randomNumber = Math.round(Math.random() * 9);
-  const generateRandomMove = () => randomNumber;
-  return { generateRandomMove };
-})();
-
 const startComputerMode = () => {
   generatePlayers.playerOneName = 'Human player';
   generatePlayers.playerTwoName = 'The Super Computer';
@@ -31,7 +25,7 @@ const startComputerMode = () => {
   selectGameTypeModal.style.display = 'none';
   gameAreaContainer.style.display = 'flex';
   gameBoard.generateNewBoard();
-  console.log(generateRandomComputerMove.generateRandomMove());
+  getGameMode.activateComputerMode();
 };
 
 vsComputerModeButton.addEventListener('click', startComputerMode);
@@ -89,25 +83,49 @@ const getPlayerTurn = (() => {
   };
 })();
 
+const getGameMode = (() => {
+  let computerMode = false;
+  const activateComputerMode = () => {
+    computerMode = true;
+  };
+  return {
+    activateComputerMode,
+    checkMode() {
+      return computerMode;
+    },
+  };
+})();
+
 const handleGameListener = (e) => {
-  handlePlayerMove(e);
+  handleUserMove(e);
 };
 
-const handlePlayerMove = (e) => {
-  const indexPosition = e.target.getAttribute('data-index-number');
-  handleGameFlow(indexPosition);
+const handleUserMove = (e) => {
+  const userMove = e.target.getAttribute('data-index-number');
+  handleGameFlow(userMove);
 };
 
-function handleGameFlow(indexPosition) {
+const handleComputerMove = () => {
+  const randomComputerMove = Math.round(Math.random() * 9);
+  if (gameBoard.getPositions()[randomComputerMove] !== '') {
+    handleComputerMove();
+    // Generates a new move if the previous move is already taken
+  } else if (gameBoard.getPositions()[randomComputerMove] === '') {
+    handleGameFlow(randomComputerMove);
+    console.log(randomComputerMove);
+  }
+};
+
+function handleGameFlow(playerMove) {
   const currentPositions = gameBoard.getPositions();
   // Places the players marker on the board and displays the next players name
   const playMove = () => {
-    if (currentPositions[indexPosition] !== '') {
+    if (currentPositions[playerMove] !== '') {
     } else if (getPlayerTurn.checkPlayer() % 2 === 0) {
-      gameBoard.placeMarker(indexPosition, 'X');
+      gameBoard.placeMarker(playerMove, 'X');
       playerNameDisplay.textContent = `${generatePlayers.playerTwoName}'s turn`;
     } else {
-      gameBoard.placeMarker(indexPosition, 'O');
+      gameBoard.placeMarker(playerMove, 'O');
       playerNameDisplay.textContent = `${generatePlayers.playerOneName}'s turn`;
     }
   };
@@ -119,10 +137,24 @@ function handleGameFlow(indexPosition) {
     });
   };
 
+  // Generates the next players move, unless the game is over
+  const generateNextMove = () => {
+    getPlayerTurn.switch();
+    if (
+      playerNameDisplay.textContent.includes('won') ||
+      playerNameDisplay.textContent.includes('draw') ||
+      getGameMode.checkMode() === false ||
+      getPlayerTurn.checkPlayer() % 2 === 0
+    ) {
+    } else {
+      handleComputerMove();
+    }
+  };
+
   playMove();
   generateBoard();
-  getPlayerTurn.switch();
   checkForGameOver(currentPositions);
+  generateNextMove();
 }
 
 function checkForGameOver(currentPositions) {
