@@ -246,3 +246,35 @@ function getAllEmptyCellsIndexes(currBdSt) {
     }
   });
 }
+
+function checkForWinner(currBdst, marker) {
+  if (
+    (currBdSt[0] === currMark &&
+      currBdSt[1] === currMark &&
+      currBdSt[2] === currMark) ||
+    (currBdSt[3] === currMark &&
+      currBdSt[4] === currMark &&
+      currBdSt[5] === currMark) ||
+    (currBdSt[6] === currMark &&
+      currBdSt[7] === currMark &&
+      currBdSt[8] === currMark) ||
+    (currBdSt[0] === currMark &&
+      currBdSt[3] === currMark &&
+      currBdSt[6] === currMark) ||
+    (currBdSt[1] === currMark &&
+      currBdSt[4] === currMark &&
+      currBdSt[7] === currMark) ||
+    (currBdSt[2] === currMark &&
+      currBdSt[5] === currMark &&
+      currBdSt[8] === currMark) ||
+    (currBdSt[0] === currMark &&
+      currBdSt[4] === currMark &&
+      currBdSt[8] === currMark) ||
+    (currBdSt[2] === currMark &&
+      currBdSt[4] === currMark &&
+      currBdSt[6] === currMark)
+  ) {
+    return true;
+  }
+  return false;
+}
