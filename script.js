@@ -90,12 +90,16 @@ const getPlayerTurn = (() => {
 })();
 
 const handleGameListener = (e) => {
-  handleGameFlow(e);
+  handlePlayerMove(e);
 };
 
-function handleGameFlow(e) {
-  const currentPositions = gameBoard.getPositions();
+const handlePlayerMove = (e) => {
   const indexPosition = e.target.getAttribute('data-index-number');
+  handleGameFlow(indexPosition);
+};
+
+function handleGameFlow(indexPosition) {
+  const currentPositions = gameBoard.getPositions();
   // Places the players marker on the board and displays the next players name
   const playMove = () => {
     if (currentPositions[indexPosition] !== '') {
