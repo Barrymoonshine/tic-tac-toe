@@ -112,7 +112,6 @@ const handleComputerMove = () => {
     // Generates a new move if the previous move is already taken
   } else if (gameBoard.getPositions()[randomComputerMove] === '') {
     handleGameFlow(randomComputerMove);
-    console.log(randomComputerMove);
   }
 };
 
@@ -132,13 +131,13 @@ function handleGameFlow(playerMove) {
 
   // Generates the board using the current players array positions
   const generateBoard = () => {
-    gameBoard.getPositions().forEach((item, index) => {
+    currentPositions.forEach((item, index) => {
       boardSquares[index].innerText = item;
     });
   };
 
-  // Generates the next players move, unless the game is over
-  const generateNextMove = () => {
+  // Generates the next player's turn
+  const generateNextTurn = () => {
     getPlayerTurn.switch();
     if (
       playerNameDisplay.textContent.includes('won') ||
@@ -154,7 +153,7 @@ function handleGameFlow(playerMove) {
   playMove();
   generateBoard();
   checkForGameOver(currentPositions);
-  generateNextMove();
+  generateNextTurn();
 }
 
 function checkForGameOver(currentPositions) {
@@ -228,3 +227,22 @@ twoPlayerModeButton.addEventListener('click', () => {
   selectGameTypeModal.style.display = 'none';
   twoPlayerFormModal.style.display = 'flex';
 });
+
+// Unbeatable AI minimax algorithm
+
+const currentBoardState = gameBoard.getPositions();
+const emptyCellIndexes = [];
+
+const humanMarker = 'X';
+const computerMarker = 'O';
+
+// This should push the index positions for all empty cells into
+// The empty cell indexes variable
+function getAllEmptyCellsIndexes(currBdSt) {
+  emptyCellIndexes.splice(0, emptyCellIndexes.length);
+  currBdSt.forEach((item, index) => {
+    if (item === '') {
+      emptyCellIndexes.push(index);
+    }
+  });
+}
