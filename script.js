@@ -9,6 +9,9 @@ const resetGameButton = document.getElementById('reset-button');
 const playerNameDisplay = document.getElementById('player-name-display');
 const boardSquares = document.getElementsByClassName('board-squares');
 
+const humanMarker = 'X';
+const computerMarker = 'O';
+
 const generatePlayers = (() => {
   const playerOneName = '';
   const playerTwoName = '';
@@ -105,14 +108,27 @@ const handleUserMove = (e) => {
   handleGameFlow(userMove);
 };
 
-const handleComputerMove = () => {
-  const randomComputerMove = Math.round(Math.random() * 9);
-  if (gameBoard.getPositions()[randomComputerMove] !== '') {
-    handleComputerMove();
-    // Generates a new move if the previous move is already taken
-  } else if (gameBoard.getPositions()[randomComputerMove] === '') {
-    handleGameFlow(randomComputerMove);
-  }
+// Generates a random move for the computer player
+// const handleRandomComputerMove = () => {
+//   const randomComputerMove = Math.round(Math.random() * 9);
+//   if (gameBoard.getPositions()[randomComputerMove] !== '') {
+//     handleComputerMove();
+//   } else if (gameBoard.getPositions()[randomComputerMove] === '') {
+//     handleGameFlow(randomComputerMove);
+//   }
+// };
+
+const handleBestComputerMove = () => {
+  const currentGameBoard = () => {
+    const board = [];
+    for (square of boardSquares) {
+      board.push(square.innerText);
+    }
+    return board;
+  };
+  const bestMove = findBestMove(currentGameBoard());
+  console.log(bestMove);
+  handleGameFlow(bestMove);
 };
 
 function handleGameFlow(playerMove) {
@@ -146,7 +162,7 @@ function handleGameFlow(playerMove) {
       getPlayerTurn.checkPlayer() % 2 === 0
     ) {
     } else {
-      handleComputerMove();
+      handleBestComputerMove();
     }
   };
 
@@ -230,51 +246,86 @@ twoPlayerModeButton.addEventListener('click', () => {
 
 // Unbeatable AI minimax algorithm
 
-const currentBoardState = gameBoard.getPositions();
-const emptyCellIndexes = [];
+function minimax(board, depth, maximizingPlayer) {
+  const playerScore = getScore(board, humanMarker);
+  const computerScore = getScore(board, computerMarker);
 
-const humanMarker = 'X';
-const computerMarker = 'O';
+  if (playerScore === 10) {
+    return depth - playerScore;
+  }
+  if (computerScore === 10) {
+    return computerScore - depth;
+  }
+  if (playerScore === 0 || computerScore === 0) {
+    return 0;
+  }
 
-// This should push the index positions for all empty cells into
-// The empty cell indexes variable
-function getAllEmptyCellsIndexes(currBdSt) {
-  emptyCellIndexes.splice(0, emptyCellIndexes.length);
-  currBdSt.forEach((item, index) => {
+  if (maximizingPlayer) {
+    let best = -Infinity;
+    board.forEach((item, index) => {
+      if (item === '') {
+        board[index] = computerMarker;
+        const score = minimax(board, depth - 1, false);
+        best = Math.max(best, score);
+        board[index] = '';
+      }
+    });
+    return best;
+  }
+  let best = Infinity;
+  board.forEach((item, index) => {
     if (item === '') {
-      emptyCellIndexes.push(index);
+      board[index] = humanMarker;
+      const score = minimax(board, depth - 1, true);
+      best = Math.min(best, score);
+      board[index] = '';
     }
   });
+  return best;
 }
 
-function checkForWinner(currBdst, marker) {
+function findBestMove(currentBoard) {
+  let bestVal = -Infinity;
+  let bestMove;
+  currentBoard.forEach((item, index) => {
+    if (item === '') {
+      currentBoard[index] = computerMarker;
+      const score = minimax(currentBoard, 0, false);
+      currentBoard[i] = '';
+      if (score > bestVal) {
+        bestVal = score;
+        bestMove = index;
+      }
+    }
+  });
+  return bestMove;
+}
+
+function getScore(board, mark) {
+  const returnIndexes = board.reduce(
+    (array, element, index) => {
+      if (element === 'X') {
+        array[0].push(index);
+      } else if (element === 'O') {
+        array[1].push(index);
+      }
+      return array;
+    },
+    [[], []]
+  );
   if (
-    (currBdSt[0] === currMark &&
-      currBdSt[1] === currMark &&
-      currBdSt[2] === currMark) ||
-    (currBdSt[3] === currMark &&
-      currBdSt[4] === currMark &&
-      currBdSt[5] === currMark) ||
-    (currBdSt[6] === currMark &&
-      currBdSt[7] === currMark &&
-      currBdSt[8] === currMark) ||
-    (currBdSt[0] === currMark &&
-      currBdSt[3] === currMark &&
-      currBdSt[6] === currMark) ||
-    (currBdSt[1] === currMark &&
-      currBdSt[4] === currMark &&
-      currBdSt[7] === currMark) ||
-    (currBdSt[2] === currMark &&
-      currBdSt[5] === currMark &&
-      currBdSt[8] === currMark) ||
-    (currBdSt[0] === currMark &&
-      currBdSt[4] === currMark &&
-      currBdSt[8] === currMark) ||
-    (currBdSt[2] === currMark &&
-      currBdSt[4] === currMark &&
-      currBdSt[6] === currMark)
+    (board[0] === mark && board[1] === mark && board[2] === mark) ||
+    (board[3] === mark && board[4] === mark && board[5] === mark) ||
+    (board[6] === mark && board[7] === mark && board[8] === mark) ||
+    (board[0] === mark && board[3] === mark && board[6] === mark) ||
+    (board[1] === mark && board[4] === mark && board[7] === mark) ||
+    (board[2] === mark && board[5] === mark && board[8] === mark) ||
+    (board[0] === mark && board[4] === mark && board[8] === mark) ||
+    (board[2] === mark && board[4] === mark && board[6] === mark)
   ) {
-    return true;
+    return 10;
   }
-  return false;
+  if (returnIndexes[0].length === 5) {
+    return 0;
+  }
 }
