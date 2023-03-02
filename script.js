@@ -69,7 +69,10 @@ const displayController = (() => {
       gameStatusDisplay.textContent = `${generatePlayers.playerTwoName} has won!`;
     }
   };
-  return { changePlayerDisplay, displayWinner };
+  const displayDraw = () => {
+    gameStatusDisplay.textContent = `It's a draw!`;
+  };
+  return { changePlayerDisplay, displayWinner, displayDraw };
 })();
 
 const gameBoard = (() => {
@@ -187,7 +190,7 @@ function handleGameFlow(playerMove, playerMarker) {
       displayController.displayWinner();
       endGame();
     } else if (getScore(currentPositions, playerMarker) === 0) {
-      gameStatusDisplay.textContent = `It's a draw!`;
+      displayController.displayDraw();
       endGame();
     }
   };
