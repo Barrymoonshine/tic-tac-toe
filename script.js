@@ -38,10 +38,9 @@ const handleTwoPlayerGame = (e) => {
     'X'
   );
   const playerTwo = playerFactory(
-    document.getElementById('player-one-name').value,
+    document.getElementById('player-two-name').value,
     'O'
   );
-
   if (currentPositions[playerMove] !== '') {
   } else if (getPlayerTurn.checkPlayer() % 2 === 0) {
     gameFlowController.playMove(playerMove, 'X');
