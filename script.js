@@ -12,9 +12,6 @@ const boardSquares = document.getElementsByClassName('board-squares');
 const humanMarker = 'X';
 const computerMarker = 'O';
 
-// Factory function to generate players
-const playerFactory = (name, marker) => ({ name, marker });
-
 const startComputerMode = () => {
   generatePlayers.playerOneName = 'Human player';
   generatePlayers.playerTwoName = 'The Super Computer';
@@ -26,34 +23,53 @@ const startComputerMode = () => {
   displayController.displayGameArea();
 };
 
+const playerDetails = (() => {
+  let isPlayerOneActive = true;
+  let activePlayer = '';
+  const playerFactory = (name, marker) => ({ name, marker });
+  const switchActivePlayer = () => {
+    if (isPlayerOneActive === true) {
+      isPlayerOneActive = false;
+    } else {
+      isPlayerOneActive = true;
+    }
+  };
+  return {
+    switchActivePlayer,
+    activePlayer() {
+      if (isPlayerOneActive === true) {
+        return (activePlayer = playerFactory(
+          document.getElementById('player-one-name').value,
+          'X'
+        ));
+      }
+      return (activePlayer = playerFactory(
+        document.getElementById('player-two-name').value,
+        'O'
+      ));
+    },
+  };
+})();
+
 const handleGameListener = (e) => {
-  handleTwoPlayerGame(e);
+  const playerName = playerDetails.activePlayer().name;
+  const playerMarker = playerDetails.activePlayer().marker;
+  handleTwoPlayerGame(e, playerName, playerMarker);
 };
 
-const handleTwoPlayerGame = (e) => {
+const handleTwoPlayerGame = (e, playerName, playerMarker) => {
   const currentPositions = gameBoard.getPositions();
   const playerMove = e.target.getAttribute('data-index-number');
-  const playerOne = playerFactory(
-    document.getElementById('player-one-name').value,
-    'X'
-  );
-  const playerTwo = playerFactory(
-    document.getElementById('player-two-name').value,
-    'O'
-  );
+  // Stops move being placed in empty cell
   if (currentPositions[playerMove] !== '') {
-  } else if (getPlayerTurn.checkPlayer() % 2 === 0) {
-    gameFlowController.playMove(playerMove, 'X');
-    displayController.changePlayerDisplay(playerTwo.name);
-    gameFlowController.generateNextTurn('X', currentPositions);
-    gameFlowController.checkEndGame('X', playerOne.name, currentPositions);
   } else {
-    gameFlowController.playMove(playerMove, 'O');
-    displayController.changePlayerDisplay(playerOne.name);
-    gameFlowController.generateNextTurn('O', currentPositions);
-    gameFlowController.checkEndGame('O', playerTwo.name, currentPositions);
+    gameFlowController.playMove(playerMove, playerMarker);
+    displayController.changePlayerDisplay(playerName);
+    gameFlowController.generateNextTurn(playerMarker, currentPositions);
+    gameFlowController.checkEndGame(playerMarker, playerName, currentPositions);
+    gameFlowController.generateBoard(currentPositions);
+    playerDetails.switchActivePlayer();
   }
-  gameFlowController.generateBoard(currentPositions);
 };
 
 const startTwoPlayerMode = (e) => {
@@ -76,10 +92,9 @@ const displayController = (() => {
   playerNamesForm.addEventListener('submit', startTwoPlayerMode);
   const displayFirstPlayer = () => {
     if (getGameMode.checkForComputerMode() === false) {
-      const playerOneName = playerFactory(
+      gameStatusDisplay.textContent = `${
         document.getElementById('player-one-name').value
-      );
-      gameStatusDisplay.textContent = `${playerOneName.name}'s turn`;
+      }'s turn`;
     } else {
       gameStatusDisplay.textContent = `$Human players's turn`;
     }
