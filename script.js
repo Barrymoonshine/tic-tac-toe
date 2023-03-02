@@ -62,7 +62,14 @@ const displayController = (() => {
       gameStatusDisplay.textContent = `${generatePlayers.playerOneName}'s turn`;
     }
   };
-  return { changePlayerDisplay };
+  const displayWinner = () => {
+    if (getPlayerTurn.checkPlayer() % 2 === 0) {
+      gameStatusDisplay.textContent = `${generatePlayers.playerOneName} has won!`;
+    } else {
+      gameStatusDisplay.textContent = `${generatePlayers.playerTwoName} has won!`;
+    }
+  };
+  return { changePlayerDisplay, displayWinner };
 })();
 
 const gameBoard = (() => {
@@ -176,23 +183,15 @@ function handleGameFlow(playerMove, playerMarker) {
 
   // Checks for an end game state
   const checkEndGame = () => {
-    if (
-      getScore(currentPositions, playerMarker) === 10 &&
-      playerMarker === 'X'
-    ) {
-      gameStatusDisplay.textContent = `${generatePlayers.playerOneName} has won!`;
-      endGame();
-    } else if (
-      getScore(currentPositions, playerMarker) === 10 &&
-      playerMarker === 'O'
-    ) {
-      gameStatusDisplay.textContent = `${generatePlayers.playerTwoName} has won!`;
+    if (getScore(currentPositions, playerMarker) === 10) {
+      displayController.displayWinner();
       endGame();
     } else if (getScore(currentPositions, playerMarker) === 0) {
       gameStatusDisplay.textContent = `It's a draw!`;
       endGame();
     }
   };
+
   playMove();
   generateBoard();
   checkEndGame();
