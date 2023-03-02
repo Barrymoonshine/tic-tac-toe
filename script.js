@@ -6,7 +6,7 @@ const twoPlayerFormModal = document.getElementById('new-game-modal');
 const playerNamesForm = document.getElementById('player-names-form');
 const gameAreaContainer = document.getElementById('game-area-container');
 const resetGameButton = document.getElementById('reset-button');
-const playerNameDisplay = document.getElementById('player-name-display');
+const gameStatusDisplay = document.getElementById('game-status-display');
 const boardSquares = document.getElementsByClassName('board-squares');
 
 const humanMarker = 'X';
@@ -24,28 +24,46 @@ const generatePlayers = (() => {
 const startComputerMode = () => {
   generatePlayers.playerOneName = 'Human player';
   generatePlayers.playerTwoName = 'The Super Computer';
-  playerNameDisplay.textContent = `${generatePlayers.playerOneName}'s turn`;
+  gameStatusDisplay.textContent = `${generatePlayers.playerOneName}'s turn`;
   selectGameTypeModal.style.display = 'none';
   gameAreaContainer.style.display = 'flex';
   gameBoard.generateNewBoard();
   getGameMode.activateComputerMode();
 };
 
-vsComputerModeButton.addEventListener('click', startComputerMode);
-
-const handleForm = (e) => {
+const startTwoPlayerMode = (e) => {
   e.preventDefault();
   const nameOne = document.getElementById('player-one-name').value;
   const nameTwo = document.getElementById('player-two-name').value;
   generatePlayers.playerOneName = nameOne;
   generatePlayers.playerTwoName = nameTwo;
-  playerNameDisplay.textContent = `${nameOne}'s turn`;
+  gameStatusDisplay.textContent = `${nameOne}'s turn`;
   gameBoard.generateNewBoard();
   gameAreaContainer.style.display = 'flex';
   twoPlayerFormModal.style.display = 'none';
 };
 
-playerNamesForm.addEventListener('submit', handleForm);
+// Module function to control changes to display elements
+const displayController = (() => {
+  startGameButton.addEventListener('click', () => {
+    selectGameTypeModal.style.display = 'flex';
+    startGameButton.style.display = 'none';
+  });
+  twoPlayerModeButton.addEventListener('click', () => {
+    selectGameTypeModal.style.display = 'none';
+    twoPlayerFormModal.style.display = 'flex';
+  });
+  vsComputerModeButton.addEventListener('click', startComputerMode);
+  playerNamesForm.addEventListener('submit', startTwoPlayerMode);
+  const changePlayerDisplay = () => {
+    if (getPlayerTurn.checkPlayer() % 2 === 0) {
+      gameStatusDisplay.textContent = `${generatePlayers.playerTwoName}'s turn`;
+    } else {
+      gameStatusDisplay.textContent = `${generatePlayers.playerOneName}'s turn`;
+    }
+  };
+  return { changePlayerDisplay };
+})();
 
 const gameBoard = (() => {
   const gameBoardArray = ['', '', '', '', '', '', '', '', ''];
@@ -93,7 +111,7 @@ const getGameMode = (() => {
   };
   return {
     activateComputerMode,
-    checkMode() {
+    checkForComputerMode() {
       return computerMode;
     },
   };
@@ -111,16 +129,6 @@ const handleUserMove = (e) => {
   }
 };
 
-// Generates a random move for the computer player
-// const handleRandomComputerMove = () => {
-//   const randomComputerMove = Math.round(Math.random() * 9);
-//   if (gameBoard.getPositions()[randomComputerMove] !== '') {
-//     handleComputerMove();
-//   } else if (gameBoard.getPositions()[randomComputerMove] === '') {
-//     handleGameFlow(randomComputerMove);
-//   }
-// };
-
 const handleBestComputerMove = () => {
   const currentGameBoard = () => {
     const board = [];
@@ -135,16 +143,13 @@ const handleBestComputerMove = () => {
 
 function handleGameFlow(playerMove, playerMarker) {
   const currentPositions = gameBoard.getPositions();
-  // Places the players marker on the board and displays the next players name
 
+  // Places the players marker on the board and displays the next players name
   const playMove = () => {
     if (currentPositions[playerMove] !== '') {
-    } else if (playerMarker === 'X') {
-      gameBoard.placeMarker(playerMove, playerMarker);
-      playerNameDisplay.textContent = `${generatePlayers.playerTwoName}'s turn`;
     } else {
-      gameBoard.placeMarker(playerMove, 'O');
-      playerNameDisplay.textContent = `${generatePlayers.playerOneName}'s turn`;
+      gameBoard.placeMarker(playerMove, playerMarker);
+      displayController.changePlayerDisplay();
     }
   };
 
@@ -161,7 +166,7 @@ function handleGameFlow(playerMove, playerMarker) {
     if (
       getScore(currentPositions, playerMarker) === 10 ||
       getScore(currentPositions, playerMarker) === 0 ||
-      getGameMode.checkMode() === false ||
+      getGameMode.checkForComputerMode() === false ||
       getPlayerTurn.checkPlayer() % 2 === 0
     ) {
     } else {
@@ -169,12 +174,22 @@ function handleGameFlow(playerMove, playerMarker) {
     }
   };
 
+  // Checks for an end game state
   const checkEndGame = () => {
-    if (getScore(currentPositions, playerMarker) === 10) {
-      playerNameDisplay.textContent = `${generatePlayers.playerOneName} has won!`;
+    if (
+      getScore(currentPositions, playerMarker) === 10 &&
+      playerMarker === 'X'
+    ) {
+      gameStatusDisplay.textContent = `${generatePlayers.playerOneName} has won!`;
+      endGame();
+    } else if (
+      getScore(currentPositions, playerMarker) === 10 &&
+      playerMarker === 'O'
+    ) {
+      gameStatusDisplay.textContent = `${generatePlayers.playerTwoName} has won!`;
       endGame();
     } else if (getScore(currentPositions, playerMarker) === 0) {
-      playerNameDisplay.textContent = `It's a draw!`;
+      gameStatusDisplay.textContent = `It's a draw!`;
       endGame();
     }
   };
@@ -223,21 +238,10 @@ function resetGame() {
   });
   gameBoard.generateNewBoard();
   getPlayerTurn.resetCount();
-  playerNameDisplay.textContent = `${generatePlayers.playerOneName}'s turn`;
+  gameStatusDisplay.textContent = `${generatePlayers.playerOneName}'s turn`;
 }
 
 resetGameButton.addEventListener('click', resetGame);
-
-// Modal event listeners
-startGameButton.addEventListener('click', () => {
-  selectGameTypeModal.style.display = 'flex';
-  startGameButton.style.display = 'none';
-});
-
-twoPlayerModeButton.addEventListener('click', () => {
-  selectGameTypeModal.style.display = 'none';
-  twoPlayerFormModal.style.display = 'flex';
-});
 
 // Unbeatable AI minimax algorithm
 
@@ -295,3 +299,13 @@ function findBestMove(board) {
   });
   return bestMove;
 }
+
+// Generates a random move for the computer player
+// const handleRandomComputerMove = () => {
+//   const randomComputerMove = Math.round(Math.random() * 9);
+//   if (gameBoard.getPositions()[randomComputerMove] !== '') {
+//     handleComputerMove();
+//   } else if (gameBoard.getPositions()[randomComputerMove] === '') {
+//     handleGameFlow(randomComputerMove);
+//   }
+// };
