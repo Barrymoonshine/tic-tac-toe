@@ -25,10 +25,10 @@ const startComputerMode = () => {
   generatePlayers.playerOneName = 'Human player';
   generatePlayers.playerTwoName = 'The Super Computer';
   gameStatusDisplay.textContent = `${generatePlayers.playerOneName}'s turn`;
-  selectGameTypeModal.style.display = 'none';
-  gameAreaContainer.style.display = 'flex';
+
   gameBoard.generateNewBoard();
   getGameMode.activateComputerMode();
+  displayController.displayGameArea();
 };
 
 const startTwoPlayerMode = (e) => {
@@ -38,9 +38,9 @@ const startTwoPlayerMode = (e) => {
   generatePlayers.playerOneName = nameOne;
   generatePlayers.playerTwoName = nameTwo;
   gameStatusDisplay.textContent = `${nameOne}'s turn`;
+
   gameBoard.generateNewBoard();
-  gameAreaContainer.style.display = 'flex';
-  twoPlayerFormModal.style.display = 'none';
+  displayController.displayGameArea();
 };
 
 // Module function to control changes to display elements
@@ -55,6 +55,11 @@ const displayController = (() => {
   });
   vsComputerModeButton.addEventListener('click', startComputerMode);
   playerNamesForm.addEventListener('submit', startTwoPlayerMode);
+  const displayGameArea = () => {
+    gameAreaContainer.style.display = 'flex';
+    twoPlayerFormModal.style.display = 'none';
+    selectGameTypeModal.style.display = 'none';
+  };
   const changePlayerDisplay = () => {
     if (getPlayerTurn.checkPlayer() % 2 === 0) {
       gameStatusDisplay.textContent = `${generatePlayers.playerTwoName}'s turn`;
@@ -72,7 +77,7 @@ const displayController = (() => {
   const displayDraw = () => {
     gameStatusDisplay.textContent = `It's a draw!`;
   };
-  return { changePlayerDisplay, displayWinner, displayDraw };
+  return { displayGameArea, changePlayerDisplay, displayWinner, displayDraw };
 })();
 
 const gameBoard = (() => {
