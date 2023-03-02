@@ -126,7 +126,9 @@ const handleBestComputerMove = () => {
     }
     return board;
   };
+
   const bestMove = findBestMove(currentGameBoard());
+
   console.log(bestMove);
   handleGameFlow(bestMove);
 };
@@ -284,14 +286,14 @@ function minimax(board, depth, maximizingPlayer) {
   return best;
 }
 
-function findBestMove(currentBoard) {
+function findBestMove(board) {
   let bestVal = -Infinity;
   let bestMove;
-  currentBoard.forEach((item, index) => {
+  board.forEach((item, index) => {
     if (item === '') {
-      currentBoard[index] = computerMarker;
-      const score = minimax(currentBoard, 0, false);
-      currentBoard[i] = '';
+      board[index] = computerMarker;
+      const score = minimax(board, 0, false);
+      board[index] = '';
       if (score > bestVal) {
         bestVal = score;
         bestMove = index;
