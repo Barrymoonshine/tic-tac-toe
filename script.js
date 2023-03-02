@@ -105,7 +105,10 @@ const handleGameListener = (e) => {
 
 const handleUserMove = (e) => {
   const userMove = e.target.getAttribute('data-index-number');
-  handleGameFlow(userMove);
+  if (getPlayerTurn.checkPlayer() % 2 === 0) handleGameFlow(userMove, 'X');
+  else {
+    handleGameFlow(userMove, 'O');
+  }
 };
 
 // Generates a random move for the computer player
@@ -126,20 +129,18 @@ const handleBestComputerMove = () => {
     }
     return board;
   };
-
   const bestMove = findBestMove(currentGameBoard());
-
-  console.log(bestMove);
-  handleGameFlow(bestMove);
+  handleGameFlow(bestMove, 'O');
 };
 
-function handleGameFlow(playerMove) {
+function handleGameFlow(playerMove, playerMarker) {
   const currentPositions = gameBoard.getPositions();
   // Places the players marker on the board and displays the next players name
+
   const playMove = () => {
     if (currentPositions[playerMove] !== '') {
-    } else if (getPlayerTurn.checkPlayer() % 2 === 0) {
-      gameBoard.placeMarker(playerMove, 'X');
+    } else if (playerMarker === 'X') {
+      gameBoard.placeMarker(playerMove, playerMarker);
       playerNameDisplay.textContent = `${generatePlayers.playerTwoName}'s turn`;
     } else {
       gameBoard.placeMarker(playerMove, 'O');
@@ -158,8 +159,8 @@ function handleGameFlow(playerMove) {
   const generateNextTurn = () => {
     getPlayerTurn.switch();
     if (
-      playerNameDisplay.textContent.includes('won') ||
-      playerNameDisplay.textContent.includes('draw') ||
+      getScore(currentPositions, playerMarker) === 10 ||
+      getScore(currentPositions, playerMarker) === 0 ||
       getGameMode.checkMode() === false ||
       getPlayerTurn.checkPlayer() % 2 === 0
     ) {
@@ -168,53 +169,45 @@ function handleGameFlow(playerMove) {
     }
   };
 
-  playMove();
-  generateBoard();
-  checkForGameOver(currentPositions);
-  generateNextTurn();
-}
-
-function checkForGameOver(currentPositions) {
-  const winningPatterns = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6],
-  ];
-  // Returns each players positions in a separate nested array
-  const returnIndexes = currentPositions.reduce(
-    (array, element, index) => {
-      if (element === 'X') {
-        array[0].push(index);
-      } else if (element === 'O') {
-        array[1].push(index);
-      }
-      return array;
-    },
-    [[], []]
-  );
-  // Loops through each players positions to look for a winner or draw
-  winningPatterns.forEach((array) => {
-    if (checkPatterns(returnIndexes[0], array)) {
+  const checkEndGame = () => {
+    if (getScore(currentPositions, playerMarker) === 10) {
       playerNameDisplay.textContent = `${generatePlayers.playerOneName} has won!`;
       endGame();
-    } else if (checkPatterns(returnIndexes[1], array)) {
-      playerNameDisplay.textContent = `${generatePlayers.playerTwoName} has won!`;
-      endGame();
-    } else if (returnIndexes[0].length === 5) {
+    } else if (getScore(currentPositions, playerMarker) === 0) {
       playerNameDisplay.textContent = `It's a draw!`;
       endGame();
     }
-  });
+  };
+  playMove();
+  generateBoard();
+  checkEndGame();
+  generateNextTurn();
 }
 
-function checkPatterns(indexes, array) {
-  // Checks if either player has made a winning move
-  return array.every((value) => indexes.includes(value));
+function getScore(board, mark) {
+  const playerOneTurns = board.reduce((array, element, index) => {
+    if (element === 'X') {
+      array.push(index);
+    }
+    return array;
+  }, []);
+  // win
+  if (
+    (board[0] === mark && board[1] === mark && board[2] === mark) ||
+    (board[3] === mark && board[4] === mark && board[5] === mark) ||
+    (board[6] === mark && board[7] === mark && board[8] === mark) ||
+    (board[0] === mark && board[3] === mark && board[6] === mark) ||
+    (board[1] === mark && board[4] === mark && board[7] === mark) ||
+    (board[2] === mark && board[5] === mark && board[8] === mark) ||
+    (board[0] === mark && board[4] === mark && board[8] === mark) ||
+    (board[2] === mark && board[4] === mark && board[6] === mark)
+  ) {
+    return 10;
+  }
+  // Draw
+  if (playerOneTurns.length === 5) {
+    return 0;
+  }
 }
 
 function endGame() {
@@ -301,33 +294,4 @@ function findBestMove(board) {
     }
   });
   return bestMove;
-}
-
-function getScore(board, mark) {
-  const returnIndexes = board.reduce(
-    (array, element, index) => {
-      if (element === 'X') {
-        array[0].push(index);
-      } else if (element === 'O') {
-        array[1].push(index);
-      }
-      return array;
-    },
-    [[], []]
-  );
-  if (
-    (board[0] === mark && board[1] === mark && board[2] === mark) ||
-    (board[3] === mark && board[4] === mark && board[5] === mark) ||
-    (board[6] === mark && board[7] === mark && board[8] === mark) ||
-    (board[0] === mark && board[3] === mark && board[6] === mark) ||
-    (board[1] === mark && board[4] === mark && board[7] === mark) ||
-    (board[2] === mark && board[5] === mark && board[8] === mark) ||
-    (board[0] === mark && board[4] === mark && board[8] === mark) ||
-    (board[2] === mark && board[4] === mark && board[6] === mark)
-  ) {
-    return 10;
-  }
-  if (returnIndexes[0].length === 5) {
-    return 0;
-  }
 }
