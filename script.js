@@ -12,14 +12,8 @@ const boardSquares = document.getElementsByClassName('board-squares');
 const humanMarker = 'X';
 const computerMarker = 'O';
 
-const generatePlayers = (() => {
-  const playerOneName = '';
-  const playerTwoName = '';
-  return {
-    playerOneName,
-    playerTwoName,
-  };
-})();
+// Factory function to generate players
+const playerFactory = (name, marker) => ({ name, marker });
 
 const startComputerMode = () => {
   generatePlayers.playerOneName = 'Human player';
@@ -28,22 +22,48 @@ const startComputerMode = () => {
 
   gameBoard.generateNewBoard();
   getGameMode.activateComputerMode();
+  displayController.displayFirstPlayer();
   displayController.displayGameArea();
+};
+
+const handleGameListener = (e) => {
+  handleTwoPlayerGame(e);
+};
+
+const handleTwoPlayerGame = (e) => {
+  const currentPositions = gameBoard.getPositions();
+  const playerMove = e.target.getAttribute('data-index-number');
+  const playerOne = playerFactory(
+    document.getElementById('player-one-name').value,
+    'X'
+  );
+  const playerTwo = playerFactory(
+    document.getElementById('player-one-name').value,
+    'O'
+  );
+
+  if (currentPositions[playerMove] !== '') {
+  } else if (getPlayerTurn.checkPlayer() % 2 === 0) {
+    gameFlowController.playMove(playerMove, 'X');
+    displayController.changePlayerDisplay(playerTwo.name);
+    gameFlowController.generateNextTurn('X', currentPositions);
+    gameFlowController.checkEndGame('X', playerOne.name, currentPositions);
+  } else {
+    gameFlowController.playMove(playerMove, 'O');
+    displayController.changePlayerDisplay(playerOne.name);
+    gameFlowController.generateNextTurn('O', currentPositions);
+    gameFlowController.checkEndGame('O', playerTwo.name, currentPositions);
+  }
+  gameFlowController.generateBoard(currentPositions);
 };
 
 const startTwoPlayerMode = (e) => {
   e.preventDefault();
-  const nameOne = document.getElementById('player-one-name').value;
-  const nameTwo = document.getElementById('player-two-name').value;
-  generatePlayers.playerOneName = nameOne;
-  generatePlayers.playerTwoName = nameTwo;
-  gameStatusDisplay.textContent = `${nameOne}'s turn`;
-
+  displayController.displayFirstPlayer();
   gameBoard.generateNewBoard();
   displayController.displayGameArea();
 };
 
-// Module function to control changes to display elements
 const displayController = (() => {
   startGameButton.addEventListener('click', () => {
     selectGameTypeModal.style.display = 'flex';
@@ -55,29 +75,37 @@ const displayController = (() => {
   });
   vsComputerModeButton.addEventListener('click', startComputerMode);
   playerNamesForm.addEventListener('submit', startTwoPlayerMode);
+  const displayFirstPlayer = () => {
+    if (getGameMode.checkForComputerMode() === false) {
+      const playerOneName = playerFactory(
+        document.getElementById('player-one-name').value
+      );
+      gameStatusDisplay.textContent = `${playerOneName.name}'s turn`;
+    } else {
+      gameStatusDisplay.textContent = `$Human players's turn`;
+    }
+  };
   const displayGameArea = () => {
     gameAreaContainer.style.display = 'flex';
     twoPlayerFormModal.style.display = 'none';
     selectGameTypeModal.style.display = 'none';
   };
-  const changePlayerDisplay = () => {
-    if (getPlayerTurn.checkPlayer() % 2 === 0) {
-      gameStatusDisplay.textContent = `${generatePlayers.playerTwoName}'s turn`;
-    } else {
-      gameStatusDisplay.textContent = `${generatePlayers.playerOneName}'s turn`;
-    }
+  const changePlayerDisplay = (nextPlayersName) => {
+    gameStatusDisplay.textContent = `${nextPlayersName}'s turn`;
   };
-  const displayWinner = () => {
-    if (getPlayerTurn.checkPlayer() % 2 === 0) {
-      gameStatusDisplay.textContent = `${generatePlayers.playerOneName} has won!`;
-    } else {
-      gameStatusDisplay.textContent = `${generatePlayers.playerTwoName} has won!`;
-    }
+  const displayWinner = (currentPlayerName) => {
+    gameStatusDisplay.textContent = `${currentPlayerName} has won!`;
   };
   const displayDraw = () => {
     gameStatusDisplay.textContent = `It's a draw!`;
   };
-  return { displayGameArea, changePlayerDisplay, displayWinner, displayDraw };
+  return {
+    displayFirstPlayer,
+    displayGameArea,
+    changePlayerDisplay,
+    displayWinner,
+    displayDraw,
+  };
 })();
 
 const gameBoard = (() => {
@@ -132,18 +160,6 @@ const getGameMode = (() => {
   };
 })();
 
-const handleGameListener = (e) => {
-  handleUserMove(e);
-};
-
-const handleUserMove = (e) => {
-  const userMove = e.target.getAttribute('data-index-number');
-  if (getPlayerTurn.checkPlayer() % 2 === 0) handleGameFlow(userMove, 'X');
-  else {
-    handleGameFlow(userMove, 'O');
-  }
-};
-
 const handleBestComputerMove = () => {
   const currentGameBoard = () => {
     const board = [];
@@ -156,27 +172,21 @@ const handleBestComputerMove = () => {
   handleGameFlow(bestMove, 'O');
 };
 
-function handleGameFlow(playerMove, playerMarker) {
-  const currentPositions = gameBoard.getPositions();
-
-  // Places the players marker on the board and displays the next players name
-  const playMove = () => {
-    if (currentPositions[playerMove] !== '') {
-    } else {
-      gameBoard.placeMarker(playerMove, playerMarker);
-      displayController.changePlayerDisplay();
-    }
+const gameFlowController = (() => {
+  // Places the players marker on the board
+  const playMove = (playerMove, playerMarker) => {
+    gameBoard.placeMarker(playerMove, playerMarker);
   };
 
   // Generates the board using the current players array positions
-  const generateBoard = () => {
+  const generateBoard = (currentPositions) => {
     currentPositions.forEach((item, index) => {
       boardSquares[index].innerText = item;
     });
   };
 
   // Generates the next player's turn
-  const generateNextTurn = () => {
+  const generateNextTurn = (playerMarker, currentPositions) => {
     getPlayerTurn.switch();
     if (
       getScore(currentPositions, playerMarker) === 10 ||
@@ -190,21 +200,17 @@ function handleGameFlow(playerMove, playerMarker) {
   };
 
   // Checks for an end game state
-  const checkEndGame = () => {
+  const checkEndGame = (playerMarker, playerName, currentPositions) => {
     if (getScore(currentPositions, playerMarker) === 10) {
-      displayController.displayWinner();
+      displayController.displayWinner(playerName);
       endGame();
     } else if (getScore(currentPositions, playerMarker) === 0) {
-      displayController.displayDraw();
+      displayController.displayDraw(playerName);
       endGame();
     }
   };
-
-  playMove();
-  generateBoard();
-  checkEndGame();
-  generateNextTurn();
-}
+  return { playMove, generateBoard, checkEndGame, generateNextTurn };
+})();
 
 function getScore(board, mark) {
   const playerOneTurns = board.reduce((array, element, index) => {
@@ -245,7 +251,7 @@ function resetGame() {
   });
   gameBoard.generateNewBoard();
   getPlayerTurn.resetCount();
-  gameStatusDisplay.textContent = `${generatePlayers.playerOneName}'s turn`;
+  displayController.displayFirstPlayer();
 }
 
 resetGameButton.addEventListener('click', resetGame);
