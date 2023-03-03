@@ -8,10 +8,6 @@ const gameAreaContainer = document.getElementById('game-area-container');
 const resetGameButton = document.getElementById('reset-button');
 const gameStatusDisplay = document.getElementById('game-status-display');
 const boardSquares = document.getElementsByClassName('board-squares');
-const boardSquaresQ = document.querySelectorAll('board-squares');
-
-const humanMarker = 'X';
-const computerMarker = 'O';
 
 const gameBoardController = (() => {
   const gameBoardArray = ['', '', '', '', '', '', '', '', ''];
@@ -189,8 +185,8 @@ const gameFlowController = (() => {
 })();
 
 function minimax(board, depth, maximizingPlayer) {
-  const playerScore = gameFlowController.getScore(board, humanMarker);
-  const computerScore = gameFlowController.getScore(board, computerMarker);
+  const playerScore = gameFlowController.getScore(board, 'X');
+  const computerScore = gameFlowController.getScore(board, 'O');
 
   if (playerScore === 10) {
     return depth - playerScore;
@@ -206,7 +202,7 @@ function minimax(board, depth, maximizingPlayer) {
     let best = -Infinity;
     board.forEach((item, index) => {
       if (item === '') {
-        board[index] = computerMarker;
+        board[index] = 'O';
         const score = minimax(board, depth - 1, false);
         best = Math.max(best, score);
         board[index] = '';
@@ -217,7 +213,7 @@ function minimax(board, depth, maximizingPlayer) {
   let best = Infinity;
   board.forEach((item, index) => {
     if (item === '') {
-      board[index] = humanMarker;
+      board[index] = 'X';
       const score = minimax(board, depth - 1, true);
       best = Math.min(best, score);
       board[index] = '';
@@ -231,7 +227,7 @@ function findBestMove(board) {
   let bestMove;
   board.forEach((item, index) => {
     if (item === '') {
-      board[index] = computerMarker;
+      board[index] = 'O';
       const score = minimax(board, 0, false);
       board[index] = '';
       if (score > bestVal) {
