@@ -284,7 +284,8 @@ const handlePlayerMove = (e) => {
     // Human player computer mode
   } else if (
     gameModeController.checkForComputerMode() === true &&
-    playerController.checkActivePlayer() === true
+    playerController.checkActivePlayer() === true &&
+    isNaN(e)
   ) {
     const playerMove = e.target.getAttribute('data-index-number');
     const playerName = playerController.getActivePlayerComputerMode().name;
@@ -292,7 +293,10 @@ const handlePlayerMove = (e) => {
     handleGame(playerMove, playerName, playerMarker);
     gameFlowController.generateComputerMove();
     // Computer player computer mode
-  } else {
+  } else if (
+    gameModeController.checkForComputerMode() === true &&
+    playerController.checkActivePlayer() === false
+  ) {
     const playerName = playerController.getActivePlayerComputerMode().name;
     const playerMarker = playerController.getActivePlayerComputerMode().marker;
     handleGame(e, playerName, playerMarker);
