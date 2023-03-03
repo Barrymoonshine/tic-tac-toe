@@ -8,6 +8,7 @@ const gameAreaContainer = document.getElementById('game-area-container');
 const resetGameButton = document.getElementById('reset-button');
 const gameStatusDisplay = document.getElementById('game-status-display');
 const boardSquares = document.getElementsByClassName('board-squares');
+const boardSquaresQ = document.querySelectorAll('board-squares');
 
 const humanMarker = 'X';
 const computerMarker = 'O';
@@ -171,15 +172,8 @@ const gameFlowController = (() => {
       return 0;
     }
   };
-  const generateComputerMove = () => {
-    const board = gameBoardController.getPositions();
-    const playerOneTurns = board.reduce((array, element, index) => {
-      if (element === 'X') {
-        array.push(index);
-      }
-      return array;
-    }, []);
-    if (playerOneTurns.length === 5) {
+  const generateComputerMove = (currentPositions) => {
+    if (gameFlowController.getScore(currentPositions, 'X') === 0) {
     } else {
       handleBestComputerMove();
     }
@@ -270,6 +264,7 @@ const handleGame = (playerMove, playerName, playerMarker) => {
     } else {
       playerController.switchActivePlayer();
       displayController.displayNextPlayer();
+      gameFlowController.generateComputerMove(currentPositions);
     }
   }
 };
@@ -291,7 +286,6 @@ const handlePlayerMove = (e) => {
     const playerName = playerController.getActivePlayerComputerMode().name;
     const playerMarker = playerController.getActivePlayerComputerMode().marker;
     handleGame(playerMove, playerName, playerMarker);
-    gameFlowController.generateComputerMove();
     // Computer player computer mode
   } else if (
     gameModeController.checkForComputerMode() === true &&
