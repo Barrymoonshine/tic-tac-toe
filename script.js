@@ -13,19 +13,26 @@ const humanMarker = 'X';
 const computerMarker = 'O';
 
 const startComputerMode = () => {
-  generatePlayers.playerOneName = 'Human player';
-  generatePlayers.playerTwoName = 'The Super Computer';
-  gameStatusDisplay.textContent = `${generatePlayers.playerOneName}'s turn`;
-
-  gameBoard.generateNewBoard();
   getGameMode.activateComputerMode();
   displayController.displayFirstPlayer();
+  gameBoard.generateNewBoard();
   displayController.displayGameArea();
+};
+
+const handleBestComputerMove = () => {
+  const getGameBoardPositions = () => {
+    const board = [];
+    for (square of boardSquares) {
+      board.push(square.innerText);
+    }
+    return board;
+  };
+  const bestMove = findBestMove(getGameBoardPositions());
+  gameFlowController.playMove(bestMove, 'O');
 };
 
 const playerDetails = (() => {
   let isPlayerOneActive = true;
-  let activePlayer = '';
   const playerFactory = (name, marker) => ({ name, marker });
   const switchActivePlayer = () => {
     if (isPlayerOneActive === true) {
@@ -36,39 +43,63 @@ const playerDetails = (() => {
   };
   return {
     switchActivePlayer,
-    activePlayer() {
+    getActivePlayerTwoPlayerMode() {
       if (isPlayerOneActive === true) {
-        return (activePlayer = playerFactory(
+        return playerFactory(
           document.getElementById('player-one-name').value,
           'X'
-        ));
+        );
       }
-      return (activePlayer = playerFactory(
+      return playerFactory(
         document.getElementById('player-two-name').value,
         'O'
-      ));
+      );
+    },
+    getActivePlayerComputerMode() {
+      if (isPlayerOneActive === true) {
+        return playerFactory('Human player', 'X');
+      }
+      return playerFactory('The Super Computer', 'O');
     },
   };
 })();
 
 const handleGameListener = (e) => {
-  const playerName = playerDetails.activePlayer().name;
-  const playerMarker = playerDetails.activePlayer().marker;
-  handleTwoPlayerGame(e, playerName, playerMarker);
+  if (getGameMode.checkForComputerMode() === false) {
+    const playerName = playerDetails.getActivePlayerTwoPlayerMode().name;
+    const playerMarker = playerDetails.getActivePlayerTwoPlayerMode().marker;
+    handleGame(e, playerName, playerMarker);
+  } else if (getGameMode.checkForComputerMode() === true) {
+    const playerName = playerDetails.getActivePlayerComputerMode().name;
+    const playerMarker = playerDetails.getActivePlayerComputerMode().marker;
+    handleGame(e, playerName, playerMarker);
+  }
 };
 
-const handleTwoPlayerGame = (e, playerName, playerMarker) => {
+const handleGame = (e, playerName, playerMarker) => {
   const currentPositions = gameBoard.getPositions();
   const playerMove = e.target.getAttribute('data-index-number');
   // Stops move being placed in empty cell
   if (currentPositions[playerMove] !== '') {
   } else {
     gameFlowController.playMove(playerMove, playerMarker);
-    displayController.changePlayerDisplay(playerName);
     gameFlowController.generateNextTurn(playerMarker, currentPositions);
-    gameFlowController.checkEndGame(playerMarker, playerName, currentPositions);
     gameFlowController.generateBoard(currentPositions);
-    playerDetails.switchActivePlayer();
+    // Win
+    if (gameFlowController.getScore(currentPositions, playerMarker) === 10) {
+      displayController.displayWinner(playerName);
+      gameFlowController.endGame();
+      // Draw
+    } else if (
+      gameFlowController.getScore(currentPositions, playerMarker) === 0
+    ) {
+      displayController.displayDraw();
+      gameFlowController.endGame();
+      // Else next round
+    } else {
+      playerDetails.switchActivePlayer();
+      displayController.displayNextPlayer();
+    }
   }
 };
 
@@ -96,7 +127,7 @@ const displayController = (() => {
         document.getElementById('player-one-name').value
       }'s turn`;
     } else {
-      gameStatusDisplay.textContent = `$Human players's turn`;
+      gameStatusDisplay.textContent = `Human players's turn`;
     }
   };
   const displayGameArea = () => {
@@ -104,8 +135,16 @@ const displayController = (() => {
     twoPlayerFormModal.style.display = 'none';
     selectGameTypeModal.style.display = 'none';
   };
-  const changePlayerDisplay = (nextPlayersName) => {
-    gameStatusDisplay.textContent = `${nextPlayersName}'s turn`;
+  const displayNextPlayer = () => {
+    if (getGameMode.checkForComputerMode() === false) {
+      gameStatusDisplay.textContent = `${
+        playerDetails.getActivePlayerTwoPlayerMode().name
+      }'s turn`;
+    } else {
+      gameStatusDisplay.textContent = `${
+        playerDetails.getActivePlayerComputerMode().name
+      }'s turn`;
+    }
   };
   const displayWinner = (currentPlayerName) => {
     gameStatusDisplay.textContent = `${currentPlayerName} has won!`;
@@ -116,7 +155,7 @@ const displayController = (() => {
   return {
     displayFirstPlayer,
     displayGameArea,
-    changePlayerDisplay,
+    displayNextPlayer,
     displayWinner,
     displayDraw,
   };
@@ -174,32 +213,17 @@ const getGameMode = (() => {
   };
 })();
 
-const handleBestComputerMove = () => {
-  const currentGameBoard = () => {
-    const board = [];
-    for (square of boardSquares) {
-      board.push(square.innerText);
-    }
-    return board;
-  };
-  const bestMove = findBestMove(currentGameBoard());
-  handleGameFlow(bestMove, 'O');
-};
-
 const gameFlowController = (() => {
-  // Places the players marker on the board
   const playMove = (playerMove, playerMarker) => {
     gameBoard.placeMarker(playerMove, playerMarker);
   };
 
-  // Generates the board using the current players array positions
   const generateBoard = (currentPositions) => {
     currentPositions.forEach((item, index) => {
       boardSquares[index].innerText = item;
     });
   };
 
-  // Generates the next player's turn
   const generateNextTurn = (playerMarker, currentPositions) => {
     getPlayerTurn.switch();
     if (
@@ -213,51 +237,41 @@ const gameFlowController = (() => {
     }
   };
 
-  // Checks for an end game state
-  const checkEndGame = (playerMarker, playerName, currentPositions) => {
-    if (getScore(currentPositions, playerMarker) === 10) {
-      displayController.displayWinner(playerName);
-      endGame();
-    } else if (getScore(currentPositions, playerMarker) === 0) {
-      displayController.displayDraw(playerName);
-      endGame();
+  const getScore = (board, mark) => {
+    const playerOneTurns = board.reduce((array, element, index) => {
+      if (element === 'X') {
+        array.push(index);
+      }
+      return array;
+    }, []);
+    // win
+    if (
+      (board[0] === mark && board[1] === mark && board[2] === mark) ||
+      (board[3] === mark && board[4] === mark && board[5] === mark) ||
+      (board[6] === mark && board[7] === mark && board[8] === mark) ||
+      (board[0] === mark && board[3] === mark && board[6] === mark) ||
+      (board[1] === mark && board[4] === mark && board[7] === mark) ||
+      (board[2] === mark && board[5] === mark && board[8] === mark) ||
+      (board[0] === mark && board[4] === mark && board[8] === mark) ||
+      (board[2] === mark && board[4] === mark && board[6] === mark)
+    ) {
+      return 10;
+    }
+    // Draw
+    if (playerOneTurns.length === 5) {
+      return 0;
     }
   };
-  return { playMove, generateBoard, checkEndGame, generateNextTurn };
-})();
 
-function getScore(board, mark) {
-  const playerOneTurns = board.reduce((array, element, index) => {
-    if (element === 'X') {
-      array.push(index);
+  const endGame = () => {
+    for (i of boardSquares) {
+      i.removeEventListener('click', handleGameListener);
+      i.style.cursor = `not-allowed`;
     }
-    return array;
-  }, []);
-  // win
-  if (
-    (board[0] === mark && board[1] === mark && board[2] === mark) ||
-    (board[3] === mark && board[4] === mark && board[5] === mark) ||
-    (board[6] === mark && board[7] === mark && board[8] === mark) ||
-    (board[0] === mark && board[3] === mark && board[6] === mark) ||
-    (board[1] === mark && board[4] === mark && board[7] === mark) ||
-    (board[2] === mark && board[5] === mark && board[8] === mark) ||
-    (board[0] === mark && board[4] === mark && board[8] === mark) ||
-    (board[2] === mark && board[4] === mark && board[6] === mark)
-  ) {
-    return 10;
-  }
-  // Draw
-  if (playerOneTurns.length === 5) {
-    return 0;
-  }
-}
+  };
 
-function endGame() {
-  for (i of boardSquares) {
-    i.removeEventListener('click', handleGameListener);
-    i.style.cursor = `not-allowed`;
-  }
-}
+  return { playMove, generateBoard, getScore, generateNextTurn, endGame };
+})();
 
 function resetGame() {
   gameBoard.getPositions().forEach((item, index) => {
@@ -273,8 +287,8 @@ resetGameButton.addEventListener('click', resetGame);
 // Unbeatable AI minimax algorithm
 
 function minimax(board, depth, maximizingPlayer) {
-  const playerScore = getScore(board, humanMarker);
-  const computerScore = getScore(board, computerMarker);
+  const playerScore = gameFlowController.getScore(board, humanMarker);
+  const computerScore = gameFlowController.getScore(board, computerMarker);
 
   if (playerScore === 10) {
     return depth - playerScore;
