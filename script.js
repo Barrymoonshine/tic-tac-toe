@@ -19,21 +19,11 @@ const startComputerMode = () => {
   displayController.displayGameArea();
 };
 
-const handleBestComputerMove = () => {
-  const getGameBoardPositions = () => {
-    const board = [];
-    for (square of boardSquares) {
-      board.push(square.innerText);
-    }
-    return board;
-  };
-  const bestMove = findBestMove(getGameBoardPositions());
-  gameFlowController.playMove(bestMove, 'O');
-};
-
 const playerDetails = (() => {
   let isPlayerOneActive = true;
-  const playerFactory = (name, marker) => ({ name, marker });
+  const resetActivePlayer = () => {
+    isPlayerOneActive = true;
+  };
   const switchActivePlayer = () => {
     if (isPlayerOneActive === true) {
       isPlayerOneActive = false;
@@ -41,7 +31,12 @@ const playerDetails = (() => {
       isPlayerOneActive = true;
     }
   };
+  const playerFactory = (name, marker) => ({ name, marker });
   return {
+    checkActivePlayer() {
+      return isPlayerOneActive;
+    },
+    resetActivePlayer,
     switchActivePlayer,
     getActivePlayerTwoPlayerMode() {
       if (isPlayerOneActive === true) {
@@ -64,26 +59,49 @@ const playerDetails = (() => {
   };
 })();
 
+const handleBestComputerMove = () => {
+  const getGameBoardPositions = () => {
+    const board = [];
+    for (square of boardSquares) {
+      board.push(square.innerText);
+    }
+    return board;
+  };
+  const bestMove = findBestMove(getGameBoardPositions());
+  handleGameListener(bestMove);
+};
+
 const handleGameListener = (e) => {
+  // Two player mode
   if (getGameMode.checkForComputerMode() === false) {
+    const playerMove = e.target.getAttribute('data-index-number');
     const playerName = playerDetails.getActivePlayerTwoPlayerMode().name;
     const playerMarker = playerDetails.getActivePlayerTwoPlayerMode().marker;
-    handleGame(e, playerName, playerMarker);
-  } else if (getGameMode.checkForComputerMode() === true) {
+    handleGame(playerMove, playerName, playerMarker);
+    // Human player computer mode
+  } else if (
+    getGameMode.checkForComputerMode() === true &&
+    playerDetails.checkActivePlayer() === true
+  ) {
+    const playerMove = e.target.getAttribute('data-index-number');
+    const playerName = playerDetails.getActivePlayerComputerMode().name;
+    const playerMarker = playerDetails.getActivePlayerComputerMode().marker;
+    handleGame(playerMove, playerName, playerMarker);
+    handleBestComputerMove();
+    // Computer player computer mode
+  } else {
     const playerName = playerDetails.getActivePlayerComputerMode().name;
     const playerMarker = playerDetails.getActivePlayerComputerMode().marker;
     handleGame(e, playerName, playerMarker);
   }
 };
 
-const handleGame = (e, playerName, playerMarker) => {
+const handleGame = (playerMove, playerName, playerMarker) => {
   const currentPositions = gameBoard.getPositions();
-  const playerMove = e.target.getAttribute('data-index-number');
   // Stops move being placed in empty cell
   if (currentPositions[playerMove] !== '') {
   } else {
     gameFlowController.playMove(playerMove, playerMarker);
-    gameFlowController.generateNextTurn(playerMarker, currentPositions);
     gameFlowController.generateBoard(currentPositions);
     // Win
     if (gameFlowController.getScore(currentPositions, playerMarker) === 10) {
@@ -182,24 +200,6 @@ const gameBoard = (() => {
   };
 })();
 
-const getPlayerTurn = (() => {
-  let playerCount = 0;
-  const changeBy = (val) => {
-    playerCount += val;
-  };
-  return {
-    switch() {
-      changeBy(1);
-    },
-    resetCount() {
-      playerCount = 0;
-    },
-    checkPlayer() {
-      return playerCount;
-    },
-  };
-})();
-
 const getGameMode = (() => {
   let computerMode = false;
   const activateComputerMode = () => {
@@ -222,19 +222,6 @@ const gameFlowController = (() => {
     currentPositions.forEach((item, index) => {
       boardSquares[index].innerText = item;
     });
-  };
-
-  const generateNextTurn = (playerMarker, currentPositions) => {
-    getPlayerTurn.switch();
-    if (
-      getScore(currentPositions, playerMarker) === 10 ||
-      getScore(currentPositions, playerMarker) === 0 ||
-      getGameMode.checkForComputerMode() === false ||
-      getPlayerTurn.checkPlayer() % 2 === 0
-    ) {
-    } else {
-      handleBestComputerMove();
-    }
   };
 
   const getScore = (board, mark) => {
@@ -270,7 +257,7 @@ const gameFlowController = (() => {
     }
   };
 
-  return { playMove, generateBoard, getScore, generateNextTurn, endGame };
+  return { playMove, generateBoard, getScore, endGame };
 })();
 
 function resetGame() {
@@ -278,7 +265,7 @@ function resetGame() {
     gameBoard.placeMarker(index, '');
   });
   gameBoard.generateNewBoard();
-  getPlayerTurn.resetCount();
+  playerDetails.resetActivePlayer();
   displayController.displayFirstPlayer();
 }
 
