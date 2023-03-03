@@ -19,7 +19,7 @@ const startComputerMode = () => {
   displayController.displayGameArea();
 };
 
-const playerDetails = (() => {
+const playerController = (() => {
   let isPlayerOneActive = true;
   const resetActivePlayer = () => {
     isPlayerOneActive = true;
@@ -75,23 +75,23 @@ const handleGameListener = (e) => {
   // Two player mode
   if (getGameMode.checkForComputerMode() === false) {
     const playerMove = e.target.getAttribute('data-index-number');
-    const playerName = playerDetails.getActivePlayerTwoPlayerMode().name;
-    const playerMarker = playerDetails.getActivePlayerTwoPlayerMode().marker;
+    const playerName = playerController.getActivePlayerTwoPlayerMode().name;
+    const playerMarker = playerController.getActivePlayerTwoPlayerMode().marker;
     handleGame(playerMove, playerName, playerMarker);
     // Human player computer mode
   } else if (
     getGameMode.checkForComputerMode() === true &&
-    playerDetails.checkActivePlayer() === true
+    playerController.checkActivePlayer() === true
   ) {
     const playerMove = e.target.getAttribute('data-index-number');
-    const playerName = playerDetails.getActivePlayerComputerMode().name;
-    const playerMarker = playerDetails.getActivePlayerComputerMode().marker;
+    const playerName = playerController.getActivePlayerComputerMode().name;
+    const playerMarker = playerController.getActivePlayerComputerMode().marker;
     handleGame(playerMove, playerName, playerMarker);
     handleBestComputerMove();
     // Computer player computer mode
   } else {
-    const playerName = playerDetails.getActivePlayerComputerMode().name;
-    const playerMarker = playerDetails.getActivePlayerComputerMode().marker;
+    const playerName = playerController.getActivePlayerComputerMode().name;
+    const playerMarker = playerController.getActivePlayerComputerMode().marker;
     handleGame(e, playerName, playerMarker);
   }
 };
@@ -115,7 +115,7 @@ const handleGame = (playerMove, playerName, playerMarker) => {
       gameFlowController.endGame();
       // Else next round
     } else {
-      playerDetails.switchActivePlayer();
+      playerController.switchActivePlayer();
       displayController.displayNextPlayer();
     }
   }
@@ -145,7 +145,9 @@ const displayController = (() => {
         document.getElementById('player-one-name').value
       }'s turn`;
     } else {
-      gameStatusDisplay.textContent = `Human players's turn`;
+      gameStatusDisplay.textContent = `${
+        playerController.getActivePlayerComputerMode().name
+      }'s turn`;
     }
   };
   const displayGameArea = () => {
@@ -156,11 +158,11 @@ const displayController = (() => {
   const displayNextPlayer = () => {
     if (getGameMode.checkForComputerMode() === false) {
       gameStatusDisplay.textContent = `${
-        playerDetails.getActivePlayerTwoPlayerMode().name
+        playerController.getActivePlayerTwoPlayerMode().name
       }'s turn`;
     } else {
       gameStatusDisplay.textContent = `${
-        playerDetails.getActivePlayerComputerMode().name
+        playerController.getActivePlayerComputerMode().name
       }'s turn`;
     }
   };
@@ -265,7 +267,7 @@ function resetGame() {
     gameBoard.placeMarker(index, '');
   });
   gameBoard.generateNewBoard();
-  playerDetails.resetActivePlayer();
+  playerController.resetActivePlayer();
   displayController.displayFirstPlayer();
 }
 
