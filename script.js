@@ -2,20 +2,12 @@ const boardSquares = document.getElementsByClassName('board-squares');
 
 const GameBoardController = (() => {
   const gameBoardArray = ['', '', '', '', '', '', '', '', ''];
-  const generateNewBoard = () => {
-    for (i of boardSquares) {
-      i.innerText = '';
-      i.style.cursor = `pointer`;
-      i.addEventListener('click', handlePlayerMove);
-    }
-  };
   const placeMarker = (index, marker) => {
     gameBoardArray[index] = marker;
   };
   const getPositions = () => gameBoardArray;
   return {
     getPositions,
-    generateNewBoard,
     placeMarker,
   };
 })();
@@ -124,10 +116,18 @@ const GameFlowController = (() => {
   const playerNamesForm = document.getElementById('player-names-form');
   const vsComputerModeButton = document.getElementById('vs-computer-mode');
 
+  const generateNewBoard = () => {
+    for (i of boardSquares) {
+      i.innerText = '';
+      i.style.cursor = `pointer`;
+      i.addEventListener('click', handlePlayerMove);
+    }
+  };
+
   const startTwoPlayerMode = (e) => {
     e.preventDefault();
     DisplayController.displayFirstPlayer();
-    GameBoardController.generateNewBoard();
+    generateNewBoard();
     DisplayController.displayGameArea();
   };
   playerNamesForm.addEventListener('submit', startTwoPlayerMode);
@@ -135,7 +135,7 @@ const GameFlowController = (() => {
   const startComputerMode = () => {
     GameModeController.activateComputerMode();
     DisplayController.displayFirstPlayer();
-    GameBoardController.generateNewBoard();
+    generateNewBoard();
     DisplayController.displayGameArea();
   };
   vsComputerModeButton.addEventListener('click', startComputerMode);
@@ -190,7 +190,7 @@ const GameFlowController = (() => {
     GameBoardController.getPositions().forEach((item, index) => {
       GameBoardController.placeMarker(index, '');
     });
-    GameBoardController.generateNewBoard();
+    generateNewBoard();
     PlayerController.resetActivePlayer();
     DisplayController.displayFirstPlayer();
   };
