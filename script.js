@@ -74,6 +74,7 @@ const DisplayController = (() => {
   const twoPlayerFormModal = document.getElementById('new-game-modal');
   const gameAreaContainer = document.getElementById('game-area-container');
   const gameStatusDisplay = document.getElementById('game-status-display');
+  let activePlayer = '';
 
   startGameButton.addEventListener('click', () => {
     selectGameTypeModal.style.display = 'flex';
@@ -83,16 +84,16 @@ const DisplayController = (() => {
     selectGameTypeModal.style.display = 'none';
     twoPlayerFormModal.style.display = 'flex';
   });
-  const displayFirstPlayer = () => {
+  const getActivePlayerName = () => {
     if (GameModeController.checkForComputerMode() === false) {
-      gameStatusDisplay.textContent = `${
-        PlayerController.getActivePlayerTwoPlayerMode().name
-      }'s turn`;
+      activePlayer = PlayerController.getActivePlayerTwoPlayerMode().name;
     } else {
-      gameStatusDisplay.textContent = `${
-        PlayerController.getActivePlayerComputerMode().name
-      }'s turn`;
+      activePlayer = PlayerController.getActivePlayerComputerMode().name;
     }
+  };
+  const displayFirstPlayer = () => {
+    getActivePlayerName();
+    gameStatusDisplay.textContent = `${activePlayer}'s turn`;
   };
   const displayGameArea = () => {
     gameAreaContainer.style.display = 'flex';
