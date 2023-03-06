@@ -236,6 +236,23 @@ const GameFlowController = (() => {
     }
   };
 
+  const findBestMove = (board) => {
+    let bestVal = -Infinity;
+    let bestMove;
+    board.forEach((item, index) => {
+      if (item === '') {
+        board[index] = 'O';
+        const score = minimax(board, 0, false);
+        board[index] = '';
+        if (score > bestVal) {
+          bestVal = score;
+          bestMove = index;
+        }
+      }
+    });
+    return bestMove;
+  };
+
   const handleBestComputerMove = () => {
     const getGameBoardPositions = () => {
       const board = [];
@@ -308,21 +325,4 @@ function minimax(board, depth, maximizingPlayer) {
     }
   });
   return best;
-}
-
-function findBestMove(board) {
-  let bestVal = -Infinity;
-  let bestMove;
-  board.forEach((item, index) => {
-    if (item === '') {
-      board[index] = 'O';
-      const score = minimax(board, 0, false);
-      board[index] = '';
-      if (score > bestVal) {
-        bestVal = score;
-        bestMove = index;
-      }
-    }
-  });
-  return bestMove;
 }
