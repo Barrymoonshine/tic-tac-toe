@@ -1,5 +1,3 @@
-const boardSquares = document.getElementsByClassName('board-squares');
-
 const GameBoardController = (() => {
   const gameBoardArray = ['', '', '', '', '', '', '', '', ''];
   const placeMarker = (index, marker) => {
@@ -115,6 +113,7 @@ const GameFlowController = (() => {
   const resetGameButton = document.getElementById('reset-button');
   const playerNamesForm = document.getElementById('player-names-form');
   const vsComputerModeButton = document.getElementById('vs-computer-mode');
+  const boardSquares = document.getElementsByClassName('board-squares');
 
   const generateNewBoard = () => {
     for (i of boardSquares) {
@@ -278,13 +277,7 @@ const GameFlowController = (() => {
   return {
     startTwoPlayerMode,
     startComputerMode,
-    playMove,
-    generateBoard,
     checkForEndGame,
-    generateComputerMove,
-    endGame,
-    handleGame,
-    handlePlayerMove,
     resetGame,
   };
 })();
