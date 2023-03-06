@@ -149,12 +149,6 @@ const GameFlowController = (() => {
     });
   };
   const getScore = (board, mark) => {
-    const playerOneTurns = board.reduce((array, element, index) => {
-      if (element === 'X') {
-        array.push(index);
-      }
-      return array;
-    }, []);
     // win
     if (
       (board[0] === mark && board[1] === mark && board[2] === mark) ||
@@ -168,6 +162,9 @@ const GameFlowController = (() => {
     ) {
       return 10;
     }
+    const playerOneTurns = board.filter(
+      (boardPosition) => boardPosition === 'X'
+    );
     // Draw
     if (playerOneTurns.length === 5) {
       return 0;
