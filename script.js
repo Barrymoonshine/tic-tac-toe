@@ -44,13 +44,12 @@ const PlayerController = (() => {
   };
   const PlayerFactory = (name, marker) => ({ name, marker });
   const getActivePlayerTwoPlayerMode = () => {
+    const playerOneName = document.getElementById('player-one-name').value;
+    const playerTwoName = document.getElementById('player-two-name').value;
     if (isPlayerOneActive) {
-      return PlayerFactory(
-        document.getElementById('player-one-name').value,
-        'X'
-      );
+      return PlayerFactory(playerOneName, 'X');
     }
-    return PlayerFactory(document.getElementById('player-two-name').value, 'O');
+    return PlayerFactory(playerTwoName, 'O');
   };
   const getActivePlayerComputerMode = () => {
     if (isPlayerOneActive) {
