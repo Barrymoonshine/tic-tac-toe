@@ -187,7 +187,7 @@ const GameFlowController = (() => {
     }
   };
 
-  const applyMove = (playerMove, playerMarker, currentPositions) => {
+  const playRound = (playerMove, playerMarker, currentPositions) => {
     if (currentPositions[playerMove] !== '') {
       // Stops move being placed in empty cell
     } else {
@@ -216,7 +216,7 @@ const GameFlowController = (() => {
       const playerMove = e.target.getAttribute('data-index-number');
       const playerMarker =
         PlayerController.getActivePlayerTwoPlayerMode().marker;
-      applyMove(playerMove, playerMarker, currentPositions);
+      playRound(playerMove, playerMarker, currentPositions);
       // Human player computer mode
     } else if (
       GameModeController.checkForComputerMode() === true &&
@@ -226,7 +226,7 @@ const GameFlowController = (() => {
       const playerMove = e.target.getAttribute('data-index-number');
       const playerMarker =
         PlayerController.getActivePlayerComputerMode().marker;
-      applyMove(playerMove, playerMarker, currentPositions);
+      playRound(playerMove, playerMarker, currentPositions);
       generateComputerMove(currentPositions);
       // Computer player computer mode
     } else if (
@@ -235,7 +235,7 @@ const GameFlowController = (() => {
     ) {
       const playerMarker =
         PlayerController.getActivePlayerComputerMode().marker;
-      applyMove(e, playerMarker, currentPositions);
+      playRound(e, playerMarker, currentPositions);
     }
   };
 
