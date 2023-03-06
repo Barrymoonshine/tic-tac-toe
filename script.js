@@ -148,6 +148,7 @@ const GameFlowController = (() => {
       boardSquares[index].innerText = item;
     });
   };
+
   const checkForEndGame = (board, mark) => {
     // win
     if (
@@ -183,6 +184,30 @@ const GameFlowController = (() => {
     }
   };
 
+  const handleGame = (playerMove, playerMarker) => {
+    const currentPositions = GameBoardController.getPositions();
+    // Stops move being placed in empty cell
+    if (currentPositions[playerMove] !== '') {
+    } else {
+      playMove(playerMove, playerMarker);
+      generateBoard(currentPositions);
+      // Win
+      if (checkForEndGame(currentPositions, playerMarker) === 10) {
+        DisplayController.displayWinner();
+        endGame();
+        // Draw
+      } else if (checkForEndGame(currentPositions, playerMarker) === 0) {
+        DisplayController.displayDraw();
+        endGame();
+        // Else next round
+      } else {
+        PlayerController.switchActivePlayer();
+        DisplayController.displayNextPlayer();
+        generateComputerMove(currentPositions);
+      }
+    }
+  };
+
   const resetGame = () => {
     GameBoardController.getPositions().forEach((item, index) => {
       GameBoardController.placeMarker(index, '');
@@ -201,6 +226,7 @@ const GameFlowController = (() => {
     checkForEndGame,
     generateComputerMove,
     endGame,
+    handleGame,
     resetGame,
   };
 })();
@@ -260,40 +286,12 @@ function findBestMove(board) {
   return bestMove;
 }
 
-const handleGame = (playerMove, playerMarker) => {
-  const currentPositions = GameBoardController.getPositions();
-  // Stops move being placed in empty cell
-  if (currentPositions[playerMove] !== '') {
-  } else {
-    GameFlowController.playMove(playerMove, playerMarker);
-    GameFlowController.generateBoard(currentPositions);
-    // Win
-    if (
-      GameFlowController.checkForEndGame(currentPositions, playerMarker) === 10
-    ) {
-      DisplayController.displayWinner();
-      GameFlowController.endGame();
-      // Draw
-    } else if (
-      GameFlowController.checkForEndGame(currentPositions, playerMarker) === 0
-    ) {
-      DisplayController.displayDraw();
-      GameFlowController.endGame();
-      // Else next round
-    } else {
-      PlayerController.switchActivePlayer();
-      DisplayController.displayNextPlayer();
-      GameFlowController.generateComputerMove(currentPositions);
-    }
-  }
-};
-
 const handlePlayerMove = (e) => {
   // Two player mode
   if (GameModeController.checkForComputerMode() === false) {
     const playerMove = e.target.getAttribute('data-index-number');
     const playerMarker = PlayerController.getActivePlayerTwoPlayerMode().marker;
-    handleGame(playerMove, playerMarker);
+    GameFlowController.handleGame(playerMove, playerMarker);
     // Human player computer mode
   } else if (
     GameModeController.checkForComputerMode() === true &&
@@ -302,14 +300,14 @@ const handlePlayerMove = (e) => {
   ) {
     const playerMove = e.target.getAttribute('data-index-number');
     const playerMarker = PlayerController.getActivePlayerComputerMode().marker;
-    handleGame(playerMove, playerMarker);
+    GameFlowController.handleGame(playerMove, playerMarker);
     // Computer player computer mode
   } else if (
     GameModeController.checkForComputerMode() === true &&
     PlayerController.checkActivePlayer() === false
   ) {
     const playerMarker = PlayerController.getActivePlayerComputerMode().marker;
-    handleGame(e, playerMarker);
+    GameFlowController.handleGame(e, playerMarker);
   }
 };
 
