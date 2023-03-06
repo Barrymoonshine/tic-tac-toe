@@ -1,13 +1,36 @@
-const startGameButton = document.getElementById('modal-button');
-const selectGameTypeModal = document.getElementById('game-type-modal');
-const twoPlayerModeButton = document.getElementById('two-player-mode');
 const vsComputerModeButton = document.getElementById('vs-computer-mode');
-const twoPlayerFormModal = document.getElementById('new-game-modal');
+
 const playerNamesForm = document.getElementById('player-names-form');
-const gameAreaContainer = document.getElementById('game-area-container');
-const resetGameButton = document.getElementById('reset-button');
-const gameStatusDisplay = document.getElementById('game-status-display');
+
 const boardSquares = document.getElementsByClassName('board-squares');
+
+const handlePlayerMove = (e) => {
+  // Two player mode
+  if (GameModeController.checkForComputerMode() === false) {
+    const playerMove = e.target.getAttribute('data-index-number');
+    const playerName = PlayerController.getActivePlayerTwoPlayerMode().name;
+    const playerMarker = PlayerController.getActivePlayerTwoPlayerMode().marker;
+    handleGame(playerMove, playerName, playerMarker);
+    // Human player computer mode
+  } else if (
+    GameModeController.checkForComputerMode() === true &&
+    PlayerController.checkActivePlayer() === true &&
+    isNaN(e)
+  ) {
+    const playerMove = e.target.getAttribute('data-index-number');
+    const playerName = PlayerController.getActivePlayerComputerMode().name;
+    const playerMarker = PlayerController.getActivePlayerComputerMode().marker;
+    handleGame(playerMove, playerName, playerMarker);
+    // Computer player computer mode
+  } else if (
+    GameModeController.checkForComputerMode() === true &&
+    PlayerController.checkActivePlayer() === false
+  ) {
+    const playerName = PlayerController.getActivePlayerComputerMode().name;
+    const playerMarker = PlayerController.getActivePlayerComputerMode().marker;
+    handleGame(e, playerName, playerMarker);
+  }
+};
 
 const GameBoardController = (() => {
   const gameBoardArray = ['', '', '', '', '', '', '', '', ''];
@@ -80,6 +103,13 @@ const PlayerController = (() => {
 })();
 
 const DisplayController = (() => {
+  const startGameButton = document.getElementById('modal-button');
+  const selectGameTypeModal = document.getElementById('game-type-modal');
+  const twoPlayerModeButton = document.getElementById('two-player-mode');
+  const twoPlayerFormModal = document.getElementById('new-game-modal');
+  const gameAreaContainer = document.getElementById('game-area-container');
+  const gameStatusDisplay = document.getElementById('game-status-display');
+
   startGameButton.addEventListener('click', () => {
     selectGameTypeModal.style.display = 'flex';
     startGameButton.style.display = 'none';
@@ -131,6 +161,7 @@ const DisplayController = (() => {
 })();
 
 const GameFlowController = (() => {
+  const resetGameButton = document.getElementById('reset-button');
   const playMove = (playerMove, playerMarker) => {
     GameBoardController.placeMarker(playerMove, playerMarker);
   };
@@ -177,7 +208,24 @@ const GameFlowController = (() => {
     }
   };
 
-  return { playMove, generateBoard, getScore, generateComputerMove, endGame };
+  const resetGame = () => {
+    GameBoardController.getPositions().forEach((item, index) => {
+      GameBoardController.placeMarker(index, '');
+    });
+    GameBoardController.generateNewBoard();
+    PlayerController.resetActivePlayer();
+    DisplayController.displayFirstPlayer();
+  };
+  resetGameButton.addEventListener('click', resetGame);
+
+  return {
+    playMove,
+    generateBoard,
+    getScore,
+    generateComputerMove,
+    endGame,
+    resetGame,
+  };
 })();
 
 function minimax(board, depth, maximizingPlayer) {
@@ -261,34 +309,6 @@ const handleGame = (playerMove, playerName, playerMarker) => {
   }
 };
 
-const handlePlayerMove = (e) => {
-  // Two player mode
-  if (GameModeController.checkForComputerMode() === false) {
-    const playerMove = e.target.getAttribute('data-index-number');
-    const playerName = PlayerController.getActivePlayerTwoPlayerMode().name;
-    const playerMarker = PlayerController.getActivePlayerTwoPlayerMode().marker;
-    handleGame(playerMove, playerName, playerMarker);
-    // Human player computer mode
-  } else if (
-    GameModeController.checkForComputerMode() === true &&
-    PlayerController.checkActivePlayer() === true &&
-    isNaN(e)
-  ) {
-    const playerMove = e.target.getAttribute('data-index-number');
-    const playerName = PlayerController.getActivePlayerComputerMode().name;
-    const playerMarker = PlayerController.getActivePlayerComputerMode().marker;
-    handleGame(playerMove, playerName, playerMarker);
-    // Computer player computer mode
-  } else if (
-    GameModeController.checkForComputerMode() === true &&
-    PlayerController.checkActivePlayer() === false
-  ) {
-    const playerName = PlayerController.getActivePlayerComputerMode().name;
-    const playerMarker = PlayerController.getActivePlayerComputerMode().marker;
-    handleGame(e, playerName, playerMarker);
-  }
-};
-
 const handleBestComputerMove = () => {
   const getGameBoardPositions = () => {
     const board = [];
@@ -316,13 +336,3 @@ const startComputerMode = () => {
   DisplayController.displayGameArea();
 };
 vsComputerModeButton.addEventListener('click', startComputerMode);
-
-function resetGame() {
-  GameBoardController.getPositions().forEach((item, index) => {
-    GameBoardController.placeMarker(index, '');
-  });
-  GameBoardController.generateNewBoard();
-  PlayerController.resetActivePlayer();
-  DisplayController.displayFirstPlayer();
-}
-resetGameButton.addEventListener('click', resetGame);
