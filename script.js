@@ -55,28 +55,27 @@ const PlayerController = (() => {
   };
   const PlayerFactory = (name, marker) => ({ name, marker });
   const checkActivePlayer = () => isPlayerOneActive;
+  const getActivePlayerTwoPlayerMode = () => {
+    if (isPlayerOneActive === true) {
+      return PlayerFactory(
+        document.getElementById('player-one-name').value,
+        'X'
+      );
+    }
+    return PlayerFactory(document.getElementById('player-two-name').value, 'O');
+  };
+  const getActivePlayerComputerMode = () => {
+    if (isPlayerOneActive === true) {
+      return PlayerFactory('Human player', 'X');
+    }
+    return PlayerFactory('The Super Computer', 'O');
+  };
   return {
     checkActivePlayer,
     resetActivePlayer,
     switchActivePlayer,
-    getActivePlayerTwoPlayerMode() {
-      if (isPlayerOneActive === true) {
-        return PlayerFactory(
-          document.getElementById('player-one-name').value,
-          'X'
-        );
-      }
-      return PlayerFactory(
-        document.getElementById('player-two-name').value,
-        'O'
-      );
-    },
-    getActivePlayerComputerMode() {
-      if (isPlayerOneActive === true) {
-        return PlayerFactory('Human player', 'X');
-      }
-      return PlayerFactory('The Super Computer', 'O');
-    },
+    getActivePlayerTwoPlayerMode,
+    getActivePlayerComputerMode,
   };
 })();
 
