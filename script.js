@@ -9,7 +9,7 @@ const resetGameButton = document.getElementById('reset-button');
 const gameStatusDisplay = document.getElementById('game-status-display');
 const boardSquares = document.getElementsByClassName('board-squares');
 
-const gameBoardController = (() => {
+const GameBoardController = (() => {
   const gameBoardArray = ['', '', '', '', '', '', '', '', ''];
   const generateNewBoard = () => {
     for (i of boardSquares) {
@@ -21,10 +21,9 @@ const gameBoardController = (() => {
   const placeMarker = (index, marker) => {
     gameBoardArray[index] = marker;
   };
+  const getPositions = () => gameBoardArray;
   return {
-    getPositions() {
-      return gameBoardArray;
-    },
+    getPositions,
     generateNewBoard,
     placeMarker,
   };
@@ -35,11 +34,10 @@ const gameModeController = (() => {
   const activateComputerMode = () => {
     computerMode = true;
   };
+  const checkForComputerMode = () => computerMode;
   return {
     activateComputerMode,
-    checkForComputerMode() {
-      return computerMode;
-    },
+    checkForComputerMode,
   };
 })();
 
@@ -56,10 +54,9 @@ const playerController = (() => {
     }
   };
   const playerFactory = (name, marker) => ({ name, marker });
+  const checkActivePlayer = () => isPlayerOneActive;
   return {
-    checkActivePlayer() {
-      return isPlayerOneActive;
-    },
+    checkActivePlayer,
     resetActivePlayer,
     switchActivePlayer,
     getActivePlayerTwoPlayerMode() {
@@ -136,7 +133,7 @@ const displayController = (() => {
 
 const gameFlowController = (() => {
   const playMove = (playerMove, playerMarker) => {
-    gameBoardController.placeMarker(playerMove, playerMarker);
+    GameBoardController.placeMarker(playerMove, playerMarker);
   };
   const generateBoard = (currentPositions) => {
     currentPositions.forEach((item, index) => {
@@ -240,7 +237,7 @@ function findBestMove(board) {
 }
 
 const handleGame = (playerMove, playerName, playerMarker) => {
-  const currentPositions = gameBoardController.getPositions();
+  const currentPositions = GameBoardController.getPositions();
   // Stops move being placed in empty cell
   if (currentPositions[playerMove] !== '') {
   } else {
@@ -308,7 +305,7 @@ const handleBestComputerMove = () => {
 const startTwoPlayerMode = (e) => {
   e.preventDefault();
   displayController.displayFirstPlayer();
-  gameBoardController.generateNewBoard();
+  GameBoardController.generateNewBoard();
   displayController.displayGameArea();
 };
 playerNamesForm.addEventListener('submit', startTwoPlayerMode);
@@ -316,16 +313,16 @@ playerNamesForm.addEventListener('submit', startTwoPlayerMode);
 const startComputerMode = () => {
   gameModeController.activateComputerMode();
   displayController.displayFirstPlayer();
-  gameBoardController.generateNewBoard();
+  GameBoardController.generateNewBoard();
   displayController.displayGameArea();
 };
 vsComputerModeButton.addEventListener('click', startComputerMode);
 
 function resetGame() {
-  gameBoardController.getPositions().forEach((item, index) => {
-    gameBoardController.placeMarker(index, '');
+  GameBoardController.getPositions().forEach((item, index) => {
+    GameBoardController.placeMarker(index, '');
   });
-  gameBoardController.generateNewBoard();
+  GameBoardController.generateNewBoard();
   playerController.resetActivePlayer();
   displayController.displayFirstPlayer();
 }
