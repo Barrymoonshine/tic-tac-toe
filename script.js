@@ -101,18 +101,12 @@ const DisplayController = (() => {
     selectGameTypeModal.style.display = 'none';
   };
   const displayNextPlayer = () => {
-    if (GameModeController.checkForComputerMode() === false) {
-      gameStatusDisplay.textContent = `${
-        PlayerController.getActivePlayerTwoPlayerMode().name
-      }'s turn`;
-    } else {
-      gameStatusDisplay.textContent = `${
-        PlayerController.getActivePlayerComputerMode().name
-      }'s turn`;
-    }
+    getActivePlayerName();
+    gameStatusDisplay.textContent = `${activePlayer}'s turn`;
   };
-  const displayWinner = (currentPlayerName) => {
-    gameStatusDisplay.textContent = `${currentPlayerName} has won!`;
+  const displayWinner = () => {
+    getActivePlayerName();
+    gameStatusDisplay.textContent = `${activePlayer} has won!`;
   };
   const displayDraw = () => {
     gameStatusDisplay.textContent = `It's a draw!`;
@@ -270,7 +264,7 @@ function findBestMove(board) {
   return bestMove;
 }
 
-const handleGame = (playerMove, playerName, playerMarker) => {
+const handleGame = (playerMove, playerMarker) => {
   const currentPositions = GameBoardController.getPositions();
   // Stops move being placed in empty cell
   if (currentPositions[playerMove] !== '') {
@@ -279,7 +273,7 @@ const handleGame = (playerMove, playerName, playerMarker) => {
     GameFlowController.generateBoard(currentPositions);
     // Win
     if (GameFlowController.getScore(currentPositions, playerMarker) === 10) {
-      DisplayController.displayWinner(playerName);
+      DisplayController.displayWinner();
       GameFlowController.endGame();
       // Draw
     } else if (
@@ -300,9 +294,8 @@ const handlePlayerMove = (e) => {
   // Two player mode
   if (GameModeController.checkForComputerMode() === false) {
     const playerMove = e.target.getAttribute('data-index-number');
-    const playerName = PlayerController.getActivePlayerTwoPlayerMode().name;
     const playerMarker = PlayerController.getActivePlayerTwoPlayerMode().marker;
-    handleGame(playerMove, playerName, playerMarker);
+    handleGame(playerMove, playerMarker);
     // Human player computer mode
   } else if (
     GameModeController.checkForComputerMode() === true &&
@@ -310,17 +303,15 @@ const handlePlayerMove = (e) => {
     isNaN(e)
   ) {
     const playerMove = e.target.getAttribute('data-index-number');
-    const playerName = PlayerController.getActivePlayerComputerMode().name;
     const playerMarker = PlayerController.getActivePlayerComputerMode().marker;
-    handleGame(playerMove, playerName, playerMarker);
+    handleGame(playerMove, playerMarker);
     // Computer player computer mode
   } else if (
     GameModeController.checkForComputerMode() === true &&
     PlayerController.checkActivePlayer() === false
   ) {
-    const playerName = PlayerController.getActivePlayerComputerMode().name;
     const playerMarker = PlayerController.getActivePlayerComputerMode().marker;
-    handleGame(e, playerName, playerMarker);
+    handleGame(e, playerMarker);
   }
 };
 
