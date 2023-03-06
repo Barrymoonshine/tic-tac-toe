@@ -148,7 +148,7 @@ const GameFlowController = (() => {
       boardSquares[index].innerText = item;
     });
   };
-  const getScore = (board, mark) => {
+  const checkForEndGame = (board, mark) => {
     // win
     if (
       (board[0] === mark && board[1] === mark && board[2] === mark) ||
@@ -171,7 +171,7 @@ const GameFlowController = (() => {
     }
   };
   const generateComputerMove = (currentPositions) => {
-    if (GameFlowController.getScore(currentPositions, 'X') === 0) {
+    if (GameFlowController.checkForEndGame(currentPositions, 'X') === 0) {
     } else {
       handleBestComputerMove();
     }
@@ -198,7 +198,7 @@ const GameFlowController = (() => {
     startComputerMode,
     playMove,
     generateBoard,
-    getScore,
+    checkForEndGame,
     generateComputerMove,
     endGame,
     resetGame,
@@ -206,8 +206,8 @@ const GameFlowController = (() => {
 })();
 
 function minimax(board, depth, maximizingPlayer) {
-  const playerScore = GameFlowController.getScore(board, 'X');
-  const computerScore = GameFlowController.getScore(board, 'O');
+  const playerScore = GameFlowController.checkForEndGame(board, 'X');
+  const computerScore = GameFlowController.checkForEndGame(board, 'O');
 
   if (playerScore === 10) {
     return depth - playerScore;
@@ -268,12 +268,14 @@ const handleGame = (playerMove, playerMarker) => {
     GameFlowController.playMove(playerMove, playerMarker);
     GameFlowController.generateBoard(currentPositions);
     // Win
-    if (GameFlowController.getScore(currentPositions, playerMarker) === 10) {
+    if (
+      GameFlowController.checkForEndGame(currentPositions, playerMarker) === 10
+    ) {
       DisplayController.displayWinner();
       GameFlowController.endGame();
       // Draw
     } else if (
-      GameFlowController.getScore(currentPositions, playerMarker) === 0
+      GameFlowController.checkForEndGame(currentPositions, playerMarker) === 0
     ) {
       DisplayController.displayDraw();
       GameFlowController.endGame();
