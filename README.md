@@ -2,7 +2,7 @@
 
 [Live demo](https://barrymoonshine.github.io/tic-tac-toe/)
 
-[Screenshot](https://raw.githubusercontent.com/Barrymoonshine/tic-tac-toe/master/images/tic-tac-toe-screenshot.png)
+![Model](https://github.com/Barrymoonshine/tic-tac-toe/blob/main/images/tic-tac-toe-screenshot.png?raw=true)
 
 ## Summary
 
