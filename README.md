@@ -1,8 +1,8 @@
 # Tic Tac Toe project
 
-[Live demo] (https://barrymoonshine.github.io/tic-tac-toe/)
+[Live demo](https://barrymoonshine.github.io/tic-tac-toe/)
 
-[Screenshot] (https://github.com/Barrymoonshine/tic-tac-toe/blob/main/images/tic-tac-toe-screenshot.png)
+[Screenshot](https://github.com/Barrymoonshine/tic-tac-toe/blob/main/images/tic-tac-toe-screenshot.png)
 
 ## Summary
 
@@ -10,9 +10,9 @@ This game of Tic Tac Toe allows users to select between two modes - 2 player, an
 
 With 2 player mode, the users input their names which are then displayed above the game board until there is a winner or draw.
 
-Computer mode pits the human player battles against an unbeatable AI that has been created using the minimax algorithm. 
+Computer mode pits the human player against an unbeatable AI that chooses the best possible next move using the minimax algorithm and recursion. 
 
-This project was made as part of the [The Odin Project] (https://www.theodinproject.com/) full stack javascript curriculum.
+This project was made as part of the [The Odin Project](https://www.theodinproject.com/) full stack javascript curriculum.
 
 ## Key learning points
 
